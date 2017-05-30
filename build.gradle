@@ -1,0 +1,23 @@
+allprojects {
+    group = 'com.rszewczyk'
+    version = '0.0.1-SNAPSHOT'
+
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+
+    repositories {
+        jcenter()
+    }
+}
+
+ext {
+    versions = [
+            assertj: '3.8.0',
+            guava: '22.0',
+            jackson: '2.8.8',
+            junit: '4.12',
+            mockito: '1.10.19',
+            rxjava: '2.1.0',
+            slf4j: '1.7.25'
+    ]
+}

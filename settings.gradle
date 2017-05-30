@@ -1,0 +1,3 @@
+rootProject.name = 'wimf'
+include 'wimf-ingest'
+
