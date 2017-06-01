@@ -73,15 +73,17 @@ public class App {
             final wimf.domain.RestaurantInspectionDAO dao =
                     handle.attach(wimf.domain.RestaurantInspectionDAO.class);
 
-            final int pageSize = maxInspectionsPage > maxInspections
+            final boolean fetchAll = maxInspections < 0;
+
+            final int pageSize = !fetchAll && maxInspectionsPage > maxInspections
                     ? maxInspections
                     : maxInspectionsPage;
 
             final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-            final Observable<RestaurantInspection> inspections = maxInspections > 0
-                    ? new RestaurantInspectionConsumer(pageSize).getAll().take(maxInspections)
-                    : new RestaurantInspectionConsumer(pageSize).getAll();
+            final Observable<RestaurantInspection> inspections = fetchAll
+                    ? new RestaurantInspectionConsumer(pageSize).getAll()
+                    : new RestaurantInspectionConsumer(pageSize).getAll().take(maxInspections);
 
             inspections.forEach(ri ->
                     wimf.domain.RestaurantInspection.newBuilder()
