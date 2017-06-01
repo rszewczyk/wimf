@@ -13,12 +13,6 @@ import java.util.Date;
  */
 final public class RestaurantInspection {
 
-    static final ImmutableList<String> DATA_FIELDS =
-            new ImmutableList.Builder<String>()
-                    .add("camis", "dba", "cuisine_description", "violation_code", "violation_description", "grade",
-                            "boro", "building", "street", "zipcode", "phone", "score", "inspection_date")
-                    .build();
-
     @JsonCreator
     public static RestaurantInspection of(
             @JsonProperty("camis") final String businessID,

@@ -87,6 +87,12 @@ public class App {
                     wimf.domain.RestaurantInspection.newBuilder()
                             .boro(ri.boro)
                             .businessName(ri.businessName)
+                            .inspectionDate(ri.inspectionDate)
+                            .grade(ri.grade)
+                            .businessID(ri.businessID)
+                            .cuisine(ri.cuisine)
+                            .violationCode(ri.violationCode)
+                            .score(ri.score)
                             .save(dao, validator));
 
         } catch (Exception e) {

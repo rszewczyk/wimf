@@ -9,6 +9,7 @@ import com.socrata.exceptions.SodaError;
 import io.reactivex.Observable;
 
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * returns a stream of restaurant inspections from New York Open Data
@@ -23,8 +24,8 @@ final class RestaurantInspectionConsumer {
     }
 
     RestaurantInspectionConsumer(final int pageSize,
-                                        final String resourceId,
-                                        final Soda2Consumer consumer) {
+                                 final String resourceId,
+                                 final Soda2Consumer consumer) {
         this.consumer = consumer;
         this.pageSize = pageSize;
         this.resourceId = resourceId;
@@ -40,7 +41,14 @@ final class RestaurantInspectionConsumer {
                         .query(resourceId,
                                 HttpLowLevel.JSON_TYPE,
                                 new SoqlQueryBuilder()
-                                        .addSelectPhrases(RestaurantInspection.DATA_FIELDS)
+                                        .addSelectPhrases(Arrays.asList("camis", "dba",
+                                                "cuisine_description", "violation_code",
+                                                "violation_description", "grade", "boro", "building",
+                                                "street", "zipcode", "phone", "score", "inspection_date"))
+                                        .setWhereClause("inspection_date > '2012-01-01T00:00:00' AND " +
+                                                "boro IS NOT NULL AND " +
+                                                "camis IS NOT NULL AND " +
+                                                "cuisine_description IS NOT NULL ")
                                         .setOffset(pageNumber * pageSize)
                                         .setLimit(pageSize)
                                         .build())
