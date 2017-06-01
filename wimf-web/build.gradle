@@ -1,0 +1,31 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
+apply plugin: 'com.moowork.node'
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+node {
+    version = '8.0.0'
+    yarnVersion = '0.24.6'
+    download = true
+}
+
+task createDockerfile(type: Dockerfile) {
+    destFile = project.file('Dockerfile')
+    from 'nginx:1'
+    maintainer 'Rob Szewczyk <rob.szew@gmail.com>'
+    addFile('build', '/usr/share/nginx/html')
+    copyFile('nginx.conf', '/etc/nginx/conf.d/default.conf')
+}
+
+task dockerBuildImage(type: DockerBuildImage, dependsOn: [createDockerfile, 'yarn_build']) {
+    inputDir = project.file('.')
+    tag = 'wimf/web'
+}
+
+task build(dependsOn: ['yarn_build', dockerBuildImage])
+task run(dependsOn: 'yarn_start')
+task test(dependsOn: 'yarn_test')
+task assemble(dependsOn: 'build')
+
+yarn_build.dependsOn(yarn_install)

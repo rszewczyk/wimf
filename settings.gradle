@@ -1,2 +1,2 @@
 rootProject.name = 'wimf'
-include 'wimf-ingest', 'wimf-common'
+include 'wimf-ingest', 'wimf-common', 'wimf-web'
