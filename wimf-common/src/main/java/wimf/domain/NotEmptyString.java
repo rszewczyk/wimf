@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface NotEmptyString {
 
-    String message() default "{wimf.validation}";
+    String message() default "not an empty string";
 
     Class<?>[] groups() default {};
 
