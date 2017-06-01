@@ -18,10 +18,8 @@ final class RestaurantInspectionConsumer {
     private final int pageSize;
     private final String resourceId;
 
-    public RestaurantInspectionConsumer() {
-        consumer = Soda2Consumer.newConsumer("https://data.cityofnewyork.us");
-        pageSize = 100_000;
-        resourceId = "9w7m-hzhe";
+    RestaurantInspectionConsumer(final int pageSize) {
+        this(pageSize, "9w7m-hzhe", Soda2Consumer.newConsumer("https://data.cityofnewyork.us"));
     }
 
     RestaurantInspectionConsumer(final int pageSize,
