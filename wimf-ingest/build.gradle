@@ -1,5 +1,7 @@
 apply plugin: 'java'
+apply plugin: 'application'
 sourceCompatibility = 1.8
+mainClassName = 'wimf.ingest.App'
 
 dependencies {
     compile project(':wimf-common')
@@ -27,6 +29,3 @@ dependencies {
     testCompile "org.assertj:assertj-core:$versions.assertj"
     testCompile "org.mockito:mockito-all:$versions.mockito"
 }
-
-apply plugin: 'application'
-mainClassName = 'wimf.ingest.App'

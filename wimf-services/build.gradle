@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.bmuschko.docker-java-application'
+sourceCompatibility = 1.8
+mainClassName = 'wimf.services.App'
+
+dependencies {
+    compile "org.glassfish.jersey.containers:jersey-container-jdk-http:$versions.jersey"
+    compile "org.glassfish.jersey.core:jersey-server:$versions.jersey"
+
+    compile "com.beust:jcommander:$versions.jcommander"
+}
+
+docker {
+    javaApplication {
+        maintainer = 'Rob Szewczyk <rob.szew@gmail.com>'
+        ports = [80]
+        tag = 'wimf/services'
+    }
+}
+
+build.dependsOn(dockerBuildImage)

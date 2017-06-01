@@ -1,6 +1,7 @@
 plugins {
     id 'com.moowork.node' version '1.1.1' apply false
     id 'com.bmuschko.docker-remote-api' version '3.0.7' apply false
+    id 'com.bmuschko.docker-java-application' version '3.0.5' apply false
 }
 
 allprojects {
@@ -20,6 +21,7 @@ ext {
             jackson: '2.8.8',
             jcommander: '1.69',
             jdbi: '3.0.0-beta1',
+            jersey: '2.25.1',
             junit: '4.12',
             mockito: '1.10.19',
             rxjava: '2.1.0',
