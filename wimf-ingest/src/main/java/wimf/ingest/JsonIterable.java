@@ -11,7 +11,7 @@ import java.util.Iterator;
 /**
  * consumes a data source as a JSON array of T using the Jackson streaming API
  */
-final class JsonIterable<T> implements IterableCloser<T> {
+final class JsonIterable<T> implements Iterable<T> {
     private final JsonParser parser;
     private final Class<T> type;
 
@@ -51,10 +51,5 @@ final class JsonIterable<T> implements IterableCloser<T> {
                 return val;
             }
         };
-    }
-
-    @Override
-    public void close() throws Exception {
-        parser.close();
     }
 }

@@ -1,8 +1,11 @@
 package wimf.ingest;
 
+import com.google.common.collect.Iterables;
 import com.socrata.api.HttpLowLevel;
 import com.socrata.api.Soda2Consumer;
 import com.socrata.builders.SoqlQueryBuilder;
+import com.socrata.exceptions.LongRunningQueryException;
+import com.socrata.exceptions.SodaError;
 import io.reactivex.Observable;
 
 import java.io.InputStream;
@@ -29,21 +32,30 @@ final class RestaurantInspectionConsumer {
         this.resourceId = resourceId;
     }
 
-    Observable<RestaurantInspection> getAll() {
-        return RxPageUtil.getAll(this::pager);
+    Observable<RestaurantInspection> getAll() throws SodaError, LongRunningQueryException {
+        return getAll(0);
     }
 
-    private IterableCloser<RestaurantInspection> pager(final int pageNumber) throws Exception {
-        final InputStream in = consumer
-                .query(resourceId,
-                        HttpLowLevel.JSON_TYPE,
-                        new SoqlQueryBuilder()
-                                .addSelectPhrases(RestaurantInspection.DATA_FIELDS)
-                                .setOffset(pageNumber * pageSize)
-                                .setLimit(pageSize)
-                                .build())
-                .getEntityInputStream();
+    private Observable<RestaurantInspection> getAll(final int pageNumber) throws SodaError, LongRunningQueryException {
+        return Observable.defer(() -> Observable.using(
+                () -> consumer
+                        .query(resourceId,
+                                HttpLowLevel.JSON_TYPE,
+                                new SoqlQueryBuilder()
+                                        .addSelectPhrases(RestaurantInspection.DATA_FIELDS)
+                                        .setOffset(pageNumber * pageSize)
+                                        .setLimit(pageSize)
+                                        .build())
+                        .getEntityInputStream(),
+                (final InputStream in) -> {
+                    Iterable<RestaurantInspection> it = JsonIterable.from(in, RestaurantInspection.class);
+                    if (Iterables.isEmpty(it)) {
+                        return Observable.empty();
+                    }
 
-        return JsonIterable.from(in, RestaurantInspection.class);
+                    return Observable.fromIterable(it).concatWith(getAll(pageNumber + 1));
+                },
+                in -> in.close()
+        ));
     }
 }
