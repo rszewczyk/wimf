@@ -14,10 +14,14 @@ ext {
     versions = [
             assertj: '3.8.0',
             guava: '22.0',
+            hibernateValidator: '5.4.1.Final',
             jackson: '2.8.8',
+            jcommander: '1.69',
+            jdbi: '3.0.0-beta1',
             junit: '4.12',
             mockito: '1.10.19',
             rxjava: '2.1.0',
-            slf4j: '1.7.25'
+            slf4j: '1.7.25',
+            validationAPI: '1.1.0.Final',
     ]
 }
