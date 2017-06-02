@@ -1,21 +1,21 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+// @flow
+import React from "react";
+import wrapWithFetcher from "./fetcher";
+import { Request } from "./fetch";
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
+const ServerHello = wrapWithFetcher()(props => <h1>{props.data}</h1>);
+
+export default function App() {
+  const req = new Request("/api/inspection");
+  req.headers.set("Accept", "text/plain");
+
+  return (
+    <div>
+      <p>
+        This page tests integration with the services backend. If everything
+        goes well you should see "Hello World" in bold below:
+      </p>
+      <ServerHello request={req} />
+    </div>
+  );
 }
-
-export default App;
