@@ -6,6 +6,8 @@ import com.socrata.api.Soda2Consumer;
 import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.soql.OrderByClause;
+import com.socrata.model.soql.SortOrder;
 import io.reactivex.Observable;
 
 import java.io.InputStream;
@@ -41,14 +43,15 @@ final class RestaurantInspectionConsumer {
                         .query(resourceId,
                                 HttpLowLevel.JSON_TYPE,
                                 new SoqlQueryBuilder()
-                                        .addSelectPhrases(Arrays.asList("camis", "dba",
-                                                "cuisine_description", "violation_code",
-                                                "violation_description", "grade", "boro", "building",
+                                        .addSelectPhrases(Arrays.asList("camis", "dba", "cuisine_description",
+                                                "violation_code", "violation_description", "grade", "boro", "building",
                                                 "street", "zipcode", "phone", "score", "inspection_date"))
                                         .setWhereClause("inspection_date > '2012-01-01T00:00:00' AND " +
                                                 "boro IS NOT NULL AND " +
                                                 "camis IS NOT NULL AND " +
                                                 "cuisine_description IS NOT NULL ")
+                                        .setOrderByPhrase(Arrays.asList(
+                                                new OrderByClause(SortOrder.Descending, "inspection_date")))
                                         .setOffset(pageNumber * pageSize)
                                         .setLimit(pageSize)
                                         .build())

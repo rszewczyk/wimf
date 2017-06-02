@@ -18,6 +18,7 @@ ext {
             assertj: '3.8.0',
             guava: '22.0',
             hibernateValidator: '5.4.1.Final',
+            hsqldb: '2.4.0',
             jackson: '2.8.8',
             jcommander: '1.69',
             jdbi: '3.0.0-beta1',

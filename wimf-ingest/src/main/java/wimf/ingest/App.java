@@ -7,6 +7,9 @@ import io.reactivex.Observable;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import wimf.domain.Database;
+import wimf.domain.PostgresDatabase;
+import wimf.domain.RestaurantInspectionDao;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -56,25 +59,19 @@ public class App {
     }
 
     private void run() throws InterruptedException {
-        final Jdbi jdbi = Jdbi.create("jdbc:postgresql://" + dbHost + "/" + dbName + "?user=" + dbUser);
-        jdbi.installPlugin(new SqlObjectPlugin());
+        final String connection = "jdbc:postgresql://" + dbHost + "/" + dbName + "?user=" + dbUser;
 
+         // hacky stand in for real service discovery - make sure we can connect within a reasonable amount of time
+        final Jdbi jdbi = Jdbi.create(connection);
         int retry = 6;
         long backOff = 500;
-
         do {
             try (final Handle handle = jdbi.open()) {
+                // we connected successfully
                 retry = 0;
-                final wimf.domain.RestaurantInspectionDAO dao =
-                        handle.attach(wimf.domain.RestaurantInspectionDAO.class);
-
-                if (drop) {
-                    dao.dropTable();
-                }
-                dao.createTable();
             } catch (final Throwable e) {
                 if (retry == 1) {
-                    System.out.printf("Failed to initialize database: %s\n", e.getMessage());
+                    System.out.printf("Failed to connect to database: %s\n", e.getMessage());
                     System.exit(1);
                 }
 
@@ -84,33 +81,45 @@ public class App {
             }
         } while(retry > 0);
 
-        try (final Handle handle = jdbi.open()) {
-            final wimf.domain.RestaurantInspectionDAO dao =
-                    handle.attach(wimf.domain.RestaurantInspectionDAO.class);
+        final Database db = new PostgresDatabase(connection);
 
-            final boolean fetchAll = maxInspections < 0;
+        try {
+            if (drop) {
+                db.drop();
+            }
+            db.create();
+        } catch (Exception e) {
+            System.out.printf("Failed to initialize database: %s\n", e.getMessage());
+        }
 
-            final int pageSize = !fetchAll && maxInspectionsPage > maxInspections
-                    ? maxInspections
-                    : maxInspectionsPage;
+        final boolean fetchAll = maxInspections < 0;
 
-            final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        final int pageSize = !fetchAll && maxInspectionsPage > maxInspections
+                ? maxInspections
+                : maxInspectionsPage;
 
+        final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+        try (final RestaurantInspectionDao dao = db.getRestaurantInspectionDao()) {
             final Observable<RestaurantInspection> inspections = fetchAll
                     ? new RestaurantInspectionConsumer(pageSize).getAll()
                     : new RestaurantInspectionConsumer(pageSize).getAll().take(maxInspections);
 
             inspections.forEach(ri ->
-                    wimf.domain.RestaurantInspection.newBuilder()
-                            .boro(ri.boro)
-                            .businessName(ri.businessName)
-                            .inspectionDate(ri.inspectionDate)
-                            .grade(ri.grade)
-                            .businessID(ri.businessID)
-                            .cuisine(ri.cuisine)
-                            .violationCode(ri.violationCode)
-                            .score(ri.score)
-                            .save(dao, validator));
+                    wimf.domain.RestaurantInspection.save(
+                            new wimf.domain.RestaurantInspection(
+                                    ri.businessName,
+                                    ri.boro,
+                                    ri.grade,
+                                    ri.inspectionDate,
+                                    ri.businessID,
+                                    ri.cuisine,
+                                    ri.violationCode,
+                                    ri.score
+                            ),
+                            dao,
+                            validator
+                    ));
 
         } catch (final Exception e) {
             System.out.println(e.getMessage());

@@ -14,28 +14,22 @@ import java.time.LocalDateTime;
  */
 public class RestaurantInspectionTest {
     private Validator validator;
-    private RestaurantInspectionDAO dao;
+    private RestaurantInspectionDao dao;
 
     @Before
     public void before() {
-        dao = mock(RestaurantInspectionDAO.class);
+        dao = mock(RestaurantInspectionDao.class);
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
     public void it_correctly_passes_validation_and_saves_in_db() {
-        RestaurantInspection.Builder rib = RestaurantInspection.newBuilder()
-                .businessName("some business")
-                .boro("some boro")
-                .grade("A")
-                .inspectionDate(LocalDateTime.now())
-                .businessID("some business ID")
-                .cuisine("some cuisine")
-                .violationCode("some violation code")
-                .score(23);
+        RestaurantInspection inspection = new RestaurantInspection("some business", "some boro",
+                "A", LocalDateTime.now(), "some business ID", "some cuisine",
+                "some violation code", 23);
 
         // when save is called
-        RestaurantInspection inspection = rib.save(dao, validator);
+        RestaurantInspection.save(inspection, dao, validator);
 
         // then no exception has been thrown
 
@@ -45,19 +39,14 @@ public class RestaurantInspectionTest {
 
     @Test
     public void it_correctly_fails_validation_and_is_not_saved_in_db() {
-        RestaurantInspection.Builder rib = RestaurantInspection.newBuilder()
-                .businessName("some business")
-                .boro("") // cannot be blank
-                .grade("A")
-                .inspectionDate(LocalDateTime.now())
-                .businessID("some business ID")
-                .cuisine("some cuisine")
-                .violationCode("some violation code")
-                .score(13);
+        // boro cannot be a blank string
+        RestaurantInspection inspection = new RestaurantInspection("some business", "",
+                "A", LocalDateTime.now(), "some business ID", "some cuisine",
+                "some violation code", 23);
 
         // when save is called then a Validation error occurs
         assertThatExceptionOfType(ValidationException.class)
-                .isThrownBy(() -> rib.save(dao, validator));
+                .isThrownBy(() -> RestaurantInspection.save(inspection, dao, validator));
 
         // and the inspection was not saved in the database
         verify(dao, times(0)).insert(any(RestaurantInspection.class));
