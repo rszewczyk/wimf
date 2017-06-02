@@ -5,7 +5,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 public interface RestaurantInspectionDAO {
     @SqlUpdate(
-            "CREATE TABLE restaurant_inspection (" +
+            "CREATE TABLE IF NOT EXISTS restaurant_inspection (" +
                 "id SERIAL PRIMARY KEY, " +
                 "business_name VARCHAR, " +
                 "boro VARCHAR, " +

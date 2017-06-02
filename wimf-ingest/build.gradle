@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'com.bmuschko.docker-java-application'
 sourceCompatibility = 1.8
 mainClassName = 'wimf.ingest.App'
 
@@ -29,3 +30,12 @@ dependencies {
     testCompile "org.assertj:assertj-core:$versions.assertj"
     testCompile "org.mockito:mockito-all:$versions.mockito"
 }
+
+docker {
+    javaApplication {
+        maintainer = 'Rob Szewczyk <rob.szew@gmail.com>'
+        tag = 'wimf/ingest'
+    }
+}
+
+build.dependsOn(dockerBuildImage)

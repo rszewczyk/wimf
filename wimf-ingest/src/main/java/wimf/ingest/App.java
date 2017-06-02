@@ -33,7 +33,7 @@ public class App {
     @Parameter(names = "--help", description = "Display usage then exit", help = true)
     private boolean help = false;
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws InterruptedException {
         final App app = new App();
 
         final JCommander jc = JCommander.newBuilder()
@@ -55,19 +55,34 @@ public class App {
         app.run();
     }
 
-    private void run() {
+    private void run() throws InterruptedException {
         final Jdbi jdbi = Jdbi.create("jdbc:postgresql://" + dbHost + "/" + dbName + "?user=" + dbUser);
         jdbi.installPlugin(new SqlObjectPlugin());
 
-        try (final Handle handle = jdbi.open()) {
-            final wimf.domain.RestaurantInspectionDAO dao =
-                    handle.attach(wimf.domain.RestaurantInspectionDAO.class);
+        int retry = 6;
+        long backOff = 500;
 
-            if (drop) {
-                dao.dropTable();
+        do {
+            try (final Handle handle = jdbi.open()) {
+                retry = 0;
+                final wimf.domain.RestaurantInspectionDAO dao =
+                        handle.attach(wimf.domain.RestaurantInspectionDAO.class);
+
+                if (drop) {
+                    dao.dropTable();
+                }
                 dao.createTable();
+            } catch (final Throwable e) {
+                if (retry == 1) {
+                    System.out.printf("Failed to initialize database: %s\n", e.getMessage());
+                    System.exit(1);
+                }
+
+                Thread.sleep(backOff);
+                backOff *= 2;
+                retry--;
             }
-        }
+        } while(retry > 0);
 
         try (final Handle handle = jdbi.open()) {
             final wimf.domain.RestaurantInspectionDAO dao =
@@ -97,7 +112,7 @@ public class App {
                             .score(ri.score)
                             .save(dao, validator));
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             System.out.println(e.getMessage());
             System.exit(1);
         }

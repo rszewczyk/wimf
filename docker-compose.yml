@@ -1,0 +1,23 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:9
+    ports:
+      - '5432'
+  ingest:
+    image: wimf/ingest
+    command:
+      - --max-inspections
+      - '100'
+    depends_on:
+      - postgres
+  services:
+    image: wimf/services
+    ports:
+      - 8000:80
+  web:
+    image: wimf/web
+    ports:
+      - 9000:80
+    depends_on:
+      - services
