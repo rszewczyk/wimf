@@ -30,6 +30,10 @@ public final class RestaurantInspectionDaoImpl implements RestaurantInspectionDa
         return dao.fetchPage(limit, offset);
     }
 
+    public long count() {
+        return dao.count();
+    }
+
     public void close() {
         handle.close();
     }
@@ -45,12 +49,17 @@ public final class RestaurantInspectionDaoImpl implements RestaurantInspectionDa
                         "cuisine, " +
                         "violation_code, " +
                         "score) " +
-                        "VALUES (:businessName, :boro, :grade, :inspectionDate, :businessID, :cuisine, :violationCode, :score)")
+                "VALUES (:businessName, :boro, :grade, :inspectionDate, " +
+                        ":businessID, :cuisine, :violationCode, :score)")
         void insert(@BindBean RestaurantInspection inspection);
 
         @RegisterRowMapper(RestaurantInspectionMapper.class)
         @SqlQuery("SELECT * from restaurant_inspection LIMIT :limit OFFSET :offset")
         List<RestaurantInspection> fetchPage(@Bind("limit") int limit, @Bind("offset") int offset);
+
+        @RegisterRowMapper(CountMapper.class)
+        @SqlQuery("SELECT count(*) from restaurant_inspection")
+        long count();
     }
 
     static public class RestaurantInspectionMapper implements RowMapper<RestaurantInspection> {
@@ -64,6 +73,13 @@ public final class RestaurantInspectionDaoImpl implements RestaurantInspectionDa
                     r.getString("cuisine"),
                     r.getString("violation_code"),
                     r.getInt("score"));
+        }
+    }
+
+    static public class CountMapper implements RowMapper<Long> {
+        @Override
+        public Long map(final ResultSet r, final StatementContext ctx) throws SQLException {
+            return r.getLong("count");
         }
     }
 }

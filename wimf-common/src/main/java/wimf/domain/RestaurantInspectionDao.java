@@ -10,4 +10,5 @@ import java.util.List;
 public interface RestaurantInspectionDao extends AutoCloseable {
     void insert(RestaurantInspection inspection);
     List<RestaurantInspection> fetchPage(int limit, int offset);
+    long count();
 }
