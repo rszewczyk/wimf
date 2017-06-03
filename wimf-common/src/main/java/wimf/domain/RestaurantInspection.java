@@ -1,6 +1,7 @@
 package wimf.domain;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -89,7 +90,7 @@ public class RestaurantInspection {
         final Set<ConstraintViolation<RestaurantInspection>> cv = validator.validate(inspection);
 
         if (cv.size() > 0) {
-            throw ValidationException.from(Collections.unmodifiableSet(cv));
+            throw new ConstraintViolationException("validation failed", Collections.unmodifiableSet(cv));
         }
 
         dao.insert(inspection);

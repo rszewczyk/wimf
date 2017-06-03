@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.*;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * tests for {@link RestaurantInspection}
  */
-public class RestaurantInspectionTest {
+public class RestaurantInspectionTests {
     private Validator validator;
     private RestaurantInspectionDao dao;
 
@@ -45,7 +46,7 @@ public class RestaurantInspectionTest {
                 "some violation code", 23);
 
         // when save is called then a Validation error occurs
-        assertThatExceptionOfType(ValidationException.class)
+        assertThatExceptionOfType(ConstraintViolationException.class)
                 .isThrownBy(() -> RestaurantInspection.save(inspection, dao, validator));
 
         // and the inspection was not saved in the database
