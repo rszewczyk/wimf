@@ -5,8 +5,23 @@ sourceCompatibility = 1.8
 mainClassName = 'wimf.services.App'
 
 dependencies {
+    compile project(':wimf-common')
+
+    compile "org.slf4j:slf4j-api:$versions.slf4j"
+    compile "ch.qos.logback:logback-classic:$versions.logback"
+
+    compile "org.postgresql:postgresql:$versions.postgres"
+
+    compile "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
+    compile "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$versions.jackson"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$versions.jackson"
+
     compile "org.glassfish.jersey.containers:jersey-container-jdk-http:$versions.jersey"
     compile "org.glassfish.jersey.core:jersey-server:$versions.jersey"
+    compile ("org.glassfish.jersey.media:jersey-media-json-jackson:$versions.jersey") {
+        exclude group: 'com.fasterxml.jackson.core'
+    }
 
     compile "com.beust:jcommander:$versions.jcommander"
 }

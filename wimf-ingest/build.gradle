@@ -18,7 +18,7 @@ dependencies {
     compile "org.jdbi:jdbi3:$versions.jdbi"
     compile "org.jdbi:jdbi3-sqlobject:$versions.jdbi"
 
-    compile 'org.postgresql:postgresql:42.1.1'
+    "org.postgresql:postgresql:$versions.postgres"
 
     compile "com.beust:jcommander:$versions.jcommander"
 

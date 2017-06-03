@@ -9,15 +9,17 @@ import org.jdbi.v3.core.Jdbi;
 public final class HsqlDatabase implements Database {
     private final Jdbi jdbi;
 
-    public HsqlDatabase() {
+    HsqlDatabase() {
         jdbi = Jdbi.create("jdbc:hsqldb:mem:wimf");
         jdbi.installPlugins();
     }
 
+    @Override
     public RestaurantInspectionDao getRestaurantInspectionDao() {
         return new RestaurantInspectionDaoImpl(jdbi.open());
     }
 
+    @Override
     public void create() {
         try (final Handle handle = jdbi.open()) {
             handle.execute("CREATE TABLE restaurant_inspection (" +
@@ -33,9 +35,22 @@ public final class HsqlDatabase implements Database {
         }
     }
 
+    @Override
     public void drop() {
         try (final Handle handle = jdbi.open()) {
             handle.execute("DROP TABLE IF EXISTS restaurant_inspection");
         }
+    }
+
+    public static class Factory implements org.glassfish.hk2.api.Factory<HsqlDatabase> {
+        Factory() {}
+
+        @Override
+        public HsqlDatabase provide() {
+            return new HsqlDatabase();
+        }
+
+        @Override
+        public void dispose(final HsqlDatabase db) {}
     }
 }
