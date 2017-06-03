@@ -11,11 +11,11 @@ import javax.inject.Singleton;
 public class DatabaseBinder extends AbstractBinder {
     private final Factory<? extends Database> factory;
 
-    public static DatabaseBinder getPostgres(final String connection) {
+    public static DatabaseBinder get(final String connection) {
         return new DatabaseBinder(new PostgresDatabase.Factory(connection));
     }
 
-    public static DatabaseBinder getHsql() {
+    static DatabaseBinder getForTests() {
         return new DatabaseBinder(new HsqlDatabase.Factory());
     }
 
@@ -23,6 +23,7 @@ public class DatabaseBinder extends AbstractBinder {
         this.factory = factory;
     }
 
+    @Override
     protected void configure() {
         bindFactory(factory).to(Database.class).in(Singleton.class);
     }

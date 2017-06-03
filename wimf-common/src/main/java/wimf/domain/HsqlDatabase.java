@@ -9,7 +9,7 @@ import org.jdbi.v3.core.Jdbi;
 public final class HsqlDatabase implements Database {
     private final Jdbi jdbi;
 
-    HsqlDatabase() {
+    public HsqlDatabase() {
         jdbi = Jdbi.create("jdbc:hsqldb:mem:wimf");
         jdbi.installPlugins();
     }

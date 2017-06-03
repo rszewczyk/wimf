@@ -5,7 +5,7 @@ sourceCompatibility = 1.8
 mainClassName = 'wimf.ingest.App'
 
 dependencies {
-    compile project(':wimf-common')
+    compile project(':wimf-services')
 
     compile "com.google.guava:guava:$versions.guava"
 

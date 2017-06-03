@@ -1,16 +1,32 @@
 package wimf.services.jaxrs;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import wimf.domain.Database;
+import wimf.domain.RestaurantInspectionDao;
+import wimf.services.dto.ListDTO;
+import wimf.services.dto.RestaurantInspectionDTO;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("/api/inspection")
 public class RestaurantInspectionResource {
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getHello() {
-        return "Hello World!";
+    private final Database db;
+
+    @Inject
+    RestaurantInspectionResource(Database db) {
+        this.db = db;
     }
 
+    @DefaultValue("50") @QueryParam("limit") int limit;
+    @DefaultValue("0") @QueryParam("offset") int offset;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public ListDTO<RestaurantInspectionDTO> getPage() throws Exception {
+
+        try(final RestaurantInspectionDao dao = db.getRestaurantInspectionDao()) {
+            return RestaurantInspectionDTO.fromModels(dao.count(), dao.fetchPage(limit, offset));
+        }
+    }
 }

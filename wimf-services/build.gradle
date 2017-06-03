@@ -24,6 +24,16 @@ dependencies {
     }
 
     compile "com.beust:jcommander:$versions.jcommander"
+
+    testCompile "junit:junit:$versions.junit"
+    testCompile "org.assertj:assertj-core:$versions.assertj"
+    testCompile "org.mockito:mockito-all:$versions.mockito"
+    testCompile ("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jdk-http:$versions.jersey") {
+        exclude group: 'junit'
+        exclude group: 'javax.servlet'
+    }
+    testCompile "org.glassfish.jersey.containers:jersey-container-jdk-http:$versions.jersey"
+    testCompile "org.hsqldb:hsqldb:$versions.hsqldb"
 }
 
 docker {

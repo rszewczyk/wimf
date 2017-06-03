@@ -22,18 +22,22 @@ public final class RestaurantInspectionDaoImpl implements RestaurantInspectionDa
         this.handle = handle;
     }
 
+    @Override
     public void insert(final RestaurantInspection inspection) {
         dao.insert(inspection);
     }
 
+    @Override
     public List<RestaurantInspection> fetchPage(final int limit, final int offset) {
         return dao.fetchPage(limit, offset);
     }
 
+    @Override
     public long count() {
         return dao.count();
     }
 
+    @Override
     public void close() {
         handle.close();
     }
