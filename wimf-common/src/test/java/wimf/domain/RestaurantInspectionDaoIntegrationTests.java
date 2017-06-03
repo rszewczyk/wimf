@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * test for {@link RestaurantInspectionDao}
  */
-public class RestaurantInspectionDaoIntegrationTest {
+public class RestaurantInspectionDaoIntegrationTests {
     private Database db;
     private RestaurantInspectionDao dao;
 
@@ -34,6 +34,25 @@ public class RestaurantInspectionDaoIntegrationTest {
 
         // then they are in the database
         assertThat(dao.fetchPage(10, 0)).hasSize(2);
+    }
+
+    @Test
+    public void it_fetches_pages() {
+        // given there are two inspections in the database
+        TEST_DATA.forEach(dao::insert);
+        assertThat(dao.fetchPage(10, 0)).hasSize(2);
+
+        // when we fetch a page of size 1
+        final List<RestaurantInspection> firstPage = dao.fetchPage(1, 0);
+
+        // then we get 1 result
+        assertThat(firstPage).hasSize(1);
+
+        // when we fetch a page of size 2 at the next offset
+        final List<RestaurantInspection> secondPage = dao.fetchPage(2, 1);
+
+        // then we get 1 result
+        assertThat(secondPage).hasSize(1);
     }
 
     @After

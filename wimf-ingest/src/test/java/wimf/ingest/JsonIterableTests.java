@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * tests for {@link JsonIterable}
  */
-public class JsonIterableTest {
+public class JsonIterableTests {
     @Test
     public void it_parses_an_empty_array() throws Exception {
         final Iterator<SomeType> iterator = JsonIterable.from(

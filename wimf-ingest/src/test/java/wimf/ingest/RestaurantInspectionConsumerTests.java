@@ -20,7 +20,7 @@ import static org.mockito.Matchers.any;
 /**
  * tests for {@link RestaurantInspectionConsumer}
  */
-public class RestaurantInspectionConsumerTest {
+public class RestaurantInspectionConsumerTests {
     private static final String SOME_RESOURCE_ID = "some_resource_id";
 
     private Soda2Consumer soda2Consumer;
