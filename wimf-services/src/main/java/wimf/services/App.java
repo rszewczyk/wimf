@@ -2,8 +2,10 @@ package wimf.services;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URI;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import com.beust.jcommander.JCommander;
@@ -11,6 +13,9 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.eclipse.jetty.server.Server;
+import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 import wimf.domain.DatabaseBinder;
 import wimf.services.jaxrs.WimfResourceConfig;
 
@@ -55,20 +60,20 @@ public class App {
     }
 
     private void run() throws IOException {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> server.stop(0)));
-
         final String connection = "jdbc:postgresql://" + dbHost + "/" + dbName + "?user=" + dbUser;
 
         final Application jerseyApp =
                 new WimfResourceConfig(DatabaseBinder.get(connection)).getApplication();
 
-        final HttpHandler handler =  RuntimeDelegate
-                .getInstance()
-                .createEndpoint(jerseyApp, HttpHandler.class);
+        final URI baseUri = UriBuilder.fromUri("http://localhost/").port(port).build();
 
-        server.createContext("/", handler);
+        final Server server = JettyHttpContainerFactory.createServer(baseUri, ResourceConfig.forApplication(jerseyApp));
 
-        server.start();
+        try {
+            server.start();
+            server.join();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
