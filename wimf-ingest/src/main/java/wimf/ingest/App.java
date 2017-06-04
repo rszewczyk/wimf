@@ -98,8 +98,6 @@ public class App {
                 ? maxInspections
                 : maxInspectionsPage;
 
-        final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-
         try (final RestaurantInspectionDao dao = db.getRestaurantInspectionDao()) {
             final Observable<RestaurantInspection> inspections = fetchAll
                     ? new RestaurantInspectionConsumer(pageSize).getAll()
@@ -107,6 +105,7 @@ public class App {
 
             inspections.forEach(ri ->
                     wimf.domain.RestaurantInspection.save(
+                            dao,
                             new wimf.domain.RestaurantInspection(
                                     ri.businessName,
                                     ri.boro,
@@ -116,9 +115,7 @@ public class App {
                                     ri.cuisine,
                                     ri.violationCode,
                                     ri.score
-                            ),
-                            dao,
-                            validator
+                            )
                     ));
 
         } catch (final Exception e) {

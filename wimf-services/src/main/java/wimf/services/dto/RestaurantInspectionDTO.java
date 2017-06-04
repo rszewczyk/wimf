@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RestaurantInspectionDTO {
+public final class RestaurantInspectionDTO {
     public final String businessName;
     public final String boro;
     public final String grade;
@@ -18,7 +18,7 @@ public class RestaurantInspectionDTO {
     public final String violationCode;
     public final int score;
 
-    public static RestaurantInspectionDTO fromModel(RestaurantInspection inspection) {
+    public static RestaurantInspectionDTO fromModel(final RestaurantInspection inspection) {
         return new RestaurantInspectionDTO(
                 inspection.getBusinessName(),
                 inspection.getBoro(),
@@ -30,9 +30,9 @@ public class RestaurantInspectionDTO {
                 inspection.getScore());
     }
 
-    public static ListDTO<RestaurantInspectionDTO> fromModels(long count,
-                                                           List<RestaurantInspection> inspections) {
-        return ListDTO.from(
+    public static ResultSetDTO fromModels(final long count,
+                                          final List<RestaurantInspection> inspections) {
+        return ResultSetDTO.from(
                 count,
                 inspections.stream()
                         .map(RestaurantInspectionDTO::fromModel)
@@ -60,13 +60,13 @@ public class RestaurantInspectionDTO {
     }
 
     private RestaurantInspectionDTO(final String businessName,
-                                   final String boro,
-                                   final String grade,
-                                   final LocalDateTime inspectionDate,
-                                   final String businessID,
-                                   final String cuisine,
-                                   final String violationCode,
-                                   final int score) {
+                                    final String boro,
+                                    final String grade,
+                                    final LocalDateTime inspectionDate,
+                                    final String businessID,
+                                    final String cuisine,
+                                    final String violationCode,
+                                    final int score) {
         this.businessName = businessName;
         this.boro = boro;
         this.grade = grade;
