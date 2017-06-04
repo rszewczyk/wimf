@@ -57,7 +57,10 @@ public class RestaurantInspectionsSummaryResourceTests extends ResourceTest {
                 .buildGet()
                 .invoke(RestaurantInspectionsSummaryDTO.class);
 
+        // then the total is 5
         assertThat(summary.total).isEqualTo(5);
+        // and there are two inspections with grade A
+        assertThat(summary.gradesByDate.get("A")).hasSize(2);
     }
 
     @Test

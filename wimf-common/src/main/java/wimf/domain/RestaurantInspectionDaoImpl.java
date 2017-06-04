@@ -4,7 +4,9 @@ import com.google.common.base.Strings;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.config.RegisterRowMapperFactory;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindMap;
@@ -14,10 +16,11 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
+final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     private final RestaurantInspectionJdbiDao dao;
     private final Handle handle;
 
@@ -64,11 +67,43 @@ public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     }
 
     @Override
+    protected List<RestaurantInspectionsSummary.Aggregation<String>> getGradeStringAggregation(final String aggName,
+                                                                                               final List<String> filter) {
+        final String wc = RestaurantInspectionUtil.getWhereClause(filter);
+        return dao.getGradeAggregation(
+                aggName,
+                Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
+                "count DESC",
+                RestaurantInspectionUtil.getWhereValues(filter));
+    }
+
+    @Override
+    protected List<RestaurantInspectionsSummary.Aggregation<LocalDateTime>> getGradeDateAggregation(final String aggName,
+                                                                                                    final List<String> filter) {
+        final String wc = RestaurantInspectionUtil.getWhereClause(filter);
+        return dao.getGradeDateAggregation(
+                aggName,
+                Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
+                "agg ASC",
+                RestaurantInspectionUtil.getWhereValues(filter));
+    }
+
+    @Override
     public void close() {
         handle.close();
     }
 
-    public interface RestaurantInspectionJdbiDao {
+    private static final String GRADE_AGG_QUERY =
+            "SELECT <select> agg, count(*) count " +
+            "FROM (" +
+                "SELECT inspection_date, business_id, grade, score, boro, cuisine, inspection_type " +
+                "FROM restaurant_inspection " +
+                "<where> " +
+                "GROUP BY inspection_date, business_id, grade, score, boro, cuisine, inspection_type " +
+            ") sub " +
+            "GROUP BY agg ORDER BY <order>";
+
+    public interface RestaurantInspectionJdbiDao extends SqlObject {
         @SqlUpdate(
                 "INSERT INTO restaurant_inspection (" +
                         "business_name, " +
@@ -102,11 +137,27 @@ public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
         @SqlQuery("SELECT count(*) from restaurant_inspection <where>")
         long count(@Define("where") String where,
                    @BindMap Map<String, Object> whereVals);
+
+        @RegisterRowMapper(StringAggregationMapper.class)
+        @SqlQuery(GRADE_AGG_QUERY)
+        List<RestaurantInspectionsSummary.Aggregation<String>> getGradeAggregation(@Define("select") String select,
+                                                                                   @Define("where") String where,
+                                                                                   @Define("order") String order,
+                                                                                   @BindMap Map<String, Object> whereVals);
+
+        @RegisterRowMapper(TimestampAggregationMapper.class)
+        @SqlQuery(GRADE_AGG_QUERY)
+        List<RestaurantInspectionsSummary.Aggregation<LocalDateTime>> getGradeDateAggregation(@Define("select") String select,
+                                                                                              @Define("where") String where,
+                                                                                              @Define("order") String order,
+                                                                                              @BindMap Map<String, Object> whereVals);
     }
 
     static public class RestaurantInspectionMapper implements RowMapper<RestaurantInspection> {
         @Override
-        public RestaurantInspection map(final ResultSet r, final StatementContext ctx) throws SQLException {
+        public RestaurantInspection map(final ResultSet r, final StatementContext ctx)
+                throws SQLException {
+
             return new RestaurantInspection(
                     r.getString("business_name"),
                     r.getString("boro"),
@@ -124,6 +175,30 @@ public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
         @Override
         public Long map(final ResultSet r, final StatementContext ctx) throws SQLException {
             return r.getLong("count");
+        }
+    }
+
+    static public class StringAggregationMapper
+            implements RowMapper<RestaurantInspectionsSummary.Aggregation<String>> {
+
+        @Override
+        public RestaurantInspectionsSummary.Aggregation<String> map(final ResultSet r, final StatementContext ctx) throws SQLException {
+            return new RestaurantInspectionsSummary.Aggregation<>(
+                    r.getString("agg"),
+                    r.getLong("count")
+            );
+        }
+    }
+
+    static public class TimestampAggregationMapper
+            implements RowMapper<RestaurantInspectionsSummary.Aggregation<LocalDateTime>> {
+
+        @Override
+        public RestaurantInspectionsSummary.Aggregation<LocalDateTime> map(final ResultSet r, final StatementContext ctx) throws SQLException {
+            return new RestaurantInspectionsSummary.Aggregation<>(
+                    r.getTimestamp("agg").toLocalDateTime(),
+                    r.getLong("count")
+            );
         }
     }
 }

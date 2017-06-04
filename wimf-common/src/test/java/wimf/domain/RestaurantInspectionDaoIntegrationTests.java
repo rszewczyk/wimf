@@ -57,6 +57,20 @@ public class RestaurantInspectionDaoIntegrationTests {
         assertThat(secondPage).hasSize(1);
     }
 
+    @Test
+    public void it_gets_a_grade_date_aggregation() {
+        // given there are two inspections in the database
+        TEST_DATA.forEach(dao::insert);
+        assertThat(dao.fetchPage(10, 0, Collections.emptyList())).hasSize(2);
+
+        // when get grades aggregated by inspection_date
+        final List<RestaurantInspectionsSummary.Aggregation<LocalDateTime>> aggs =
+            dao.getGradeDateAggregation("inspection_date", Collections.emptyList());
+
+        // then we get two aggregations
+        assertThat(aggs).hasSize(2);
+    }
+
     @After
     public void after() {
         db.drop();
@@ -68,7 +82,7 @@ public class RestaurantInspectionDaoIntegrationTests {
                             "business1",
                             "boro1",
                             "A",
-                            LocalDateTime.now(),
+                            LocalDateTime.of(2016, 3, 1, 0, 0),
                             "b1",
                             "Donuts",
                             "1A",
@@ -79,7 +93,7 @@ public class RestaurantInspectionDaoIntegrationTests {
                             "business2",
                             "boro2",
                             "B",
-                            LocalDateTime.now(),
+                            LocalDateTime.of(2016, 5, 1, 0, 0),
                             "b2",
                             "Pizza",
                             "1C",

@@ -2,11 +2,11 @@ package wimf.services.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 import wimf.domain.RestaurantInspection;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class RestaurantInspectionDTO {
     public static RestaurantInspectionDTO fromModel(final RestaurantInspection inspection) {
@@ -25,7 +25,7 @@ public final class RestaurantInspectionDTO {
     public static List<RestaurantInspectionDTO> fromModels(final List<RestaurantInspection> inspections) {
         return inspections.stream()
                 .map(RestaurantInspectionDTO::fromModel)
-                .collect(Collectors.toList());
+                .collect(ImmutableList.toImmutableList());
     }
 
     public final String businessName;

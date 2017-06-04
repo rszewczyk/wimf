@@ -1,5 +1,6 @@
 package wimf.domain;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -18,5 +19,12 @@ public abstract class RestaurantInspectionDao implements AutoCloseable {
                                                             final int offset,
                                                             final List<String> sort,
                                                             final List<String> filter);
+
+    abstract protected List<RestaurantInspectionsSummary.Aggregation<String>> getGradeStringAggregation(final String aggName,
+                                                                                                        final List<String> filter);
+
+    abstract protected List<RestaurantInspectionsSummary.Aggregation<LocalDateTime>> getGradeDateAggregation(final String aggName,
+                                                                                                             final List<String> filter);
+
     abstract protected long count(final List<String> filter);
 }
