@@ -49,6 +49,7 @@ final class RestaurantInspectionConsumer {
                                         .setWhereClause("inspection_date > '2012-01-01T00:00:00' AND " +
                                                 "boro IS NOT NULL AND " +
                                                 "camis IS NOT NULL AND " +
+                                                "grade IS NOT NULL" +
                                                 "cuisine_description IS NOT NULL ")
                                         .setOrderByPhrase(Arrays.asList(
                                                 new OrderByClause(SortOrder.Descending, "inspection_date")))
