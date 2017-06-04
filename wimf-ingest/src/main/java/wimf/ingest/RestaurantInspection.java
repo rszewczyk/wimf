@@ -27,10 +27,27 @@ final public class RestaurantInspection {
             @JsonProperty("zipcode") final String zipCode,
             @JsonProperty("phone") final String phone,
             @JsonProperty("score") final int score,
-            @JsonProperty("inspection_date") final Date date) {
-        final LocalDateTime inspectionDate = LocalDateTime.ofInstant(date.toInstant(), ZoneOffset.systemDefault());
-        return new RestaurantInspection(businessID, businessName, cuisine, violationCode, violationDescription,
-                grade, boro, building, street, zipCode, phone, score, inspectionDate);
+            @JsonProperty("inspection_date") final Date date,
+            @JsonProperty("inspection_type") final String inspectionType) {
+
+        final LocalDateTime inspectionDate =
+                LocalDateTime.ofInstant(date.toInstant(), ZoneOffset.systemDefault());
+
+        return new RestaurantInspection(
+                businessID,
+                businessName,
+                cuisine,
+                violationCode,
+                violationDescription,
+                grade,
+                boro,
+                building,
+                street,
+                zipCode,
+                phone,
+                score,
+                inspectionDate,
+                inspectionType);
     }
 
     public static RestaurantInspection of(
@@ -46,9 +63,24 @@ final public class RestaurantInspection {
             final String zipCode,
             final String phone,
             final int score,
-            final LocalDateTime inspectionDate) {
-        return new RestaurantInspection(businessID, businessName, cuisine, violationCode, violationDescription,
-                grade, boro, building, street, zipCode, phone, score, inspectionDate);
+            final LocalDateTime inspectionDate,
+            final String inspectionType) {
+
+        return new RestaurantInspection(
+                businessID,
+                businessName,
+                cuisine,
+                violationCode,
+                violationDescription,
+                grade,
+                boro,
+                building,
+                street,
+                zipCode,
+                phone,
+                score,
+                inspectionDate,
+                inspectionType);
     }
 
     public final String businessID;
@@ -64,6 +96,7 @@ final public class RestaurantInspection {
     public final String phone;
     public final int score;
     public final LocalDateTime inspectionDate;
+    public final String inspectionType;
 
     private RestaurantInspection(
             final String businessID,
@@ -78,7 +111,9 @@ final public class RestaurantInspection {
             final String zipCode,
             final String phone,
             final int score,
-            final LocalDateTime inspectionDate) {
+            final LocalDateTime inspectionDate,
+            final String inspectionType) {
+
         this.businessID = businessID;
         this.businessName = businessName;
         this.cuisine = cuisine;
@@ -92,5 +127,6 @@ final public class RestaurantInspection {
         this.phone = phone;
         this.score = score;
         this.inspectionDate = inspectionDate;
+        this.inspectionType = inspectionType;
     }
 }

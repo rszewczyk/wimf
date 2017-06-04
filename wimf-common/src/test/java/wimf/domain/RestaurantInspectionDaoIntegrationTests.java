@@ -72,7 +72,8 @@ public class RestaurantInspectionDaoIntegrationTests {
                             "b1",
                             "Donuts",
                             "1A",
-                            10
+                            10,
+                            "inspection type 1"
                     ),
                     new RestaurantInspection(
                             "business2",
@@ -82,7 +83,8 @@ public class RestaurantInspectionDaoIntegrationTests {
                             "b2",
                             "Pizza",
                             "1C",
-                            14
+                            14,
+                            "inspection type 1"
                     )
             );
 }

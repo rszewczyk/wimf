@@ -17,6 +17,7 @@ public final class RestaurantInspectionDTO {
     public final String cuisine;
     public final String violationCode;
     public final int score;
+    public final String inspectionType;
 
     public static RestaurantInspectionDTO fromModel(final RestaurantInspection inspection) {
         return new RestaurantInspectionDTO(
@@ -27,7 +28,8 @@ public final class RestaurantInspectionDTO {
                 inspection.businessID,
                 inspection.cuisine,
                 inspection.violationCode,
-                inspection.score);
+                inspection.score,
+                inspection.inspectionType);
     }
 
     public static ResultSetDTO fromModels(final long count,
@@ -47,7 +49,8 @@ public final class RestaurantInspectionDTO {
                                              @JsonProperty("businessID") final String businessID,
                                              @JsonProperty("cuisine") final String cuisine,
                                              @JsonProperty("violationCode") final String violationCode,
-                                             @JsonProperty("score") final int score) {
+                                             @JsonProperty("score") final int score,
+                                             @JsonProperty("inspectionType") final String inspectionType) {
         return new RestaurantInspectionDTO(
                 businessName,
                 boro,
@@ -56,7 +59,8 @@ public final class RestaurantInspectionDTO {
                 businessID,
                 cuisine,
                 violationCode,
-                score);
+                score,
+                inspectionType);
     }
 
     private RestaurantInspectionDTO(final String businessName,
@@ -66,7 +70,9 @@ public final class RestaurantInspectionDTO {
                                     final String businessID,
                                     final String cuisine,
                                     final String violationCode,
-                                    final int score) {
+                                    final int score,
+                                    final String inspectionType) {
+
         this.businessName = businessName;
         this.boro = boro;
         this.grade = grade;
@@ -75,5 +81,6 @@ public final class RestaurantInspectionDTO {
         this.cuisine = cuisine;
         this.violationCode = violationCode;
         this.score = score;
+        this.inspectionType = inspectionType;
     }
 }

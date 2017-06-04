@@ -43,13 +43,16 @@ final class RestaurantInspectionConsumer {
                         .query(resourceId,
                                 HttpLowLevel.JSON_TYPE,
                                 new SoqlQueryBuilder()
-                                        .addSelectPhrases(Arrays.asList("camis", "dba", "cuisine_description",
-                                                "violation_code", "violation_description", "grade", "boro", "building",
-                                                "street", "zipcode", "phone", "score", "inspection_date"))
+                                        .addSelectPhrases(Arrays.asList("camis", "dba",
+                                                "cuisine_description", "violation_code",
+                                                "violation_description", "grade", "boro", "building",
+                                                "street", "zipcode", "phone", "score", "inspection_date",
+                                                "inspection_type"))
                                         .setWhereClause("inspection_date > '2012-01-01T00:00:00' AND " +
                                                 "boro IS NOT NULL AND " +
                                                 "camis IS NOT NULL AND " +
-                                                "grade IS NOT NULL" +
+                                                "grade IS NOT NULL AND " +
+                                                "violation_code IS NOT NULL AND " +
                                                 "cuisine_description IS NOT NULL ")
                                         .setOrderByPhrase(Arrays.asList(
                                                 new OrderByClause(SortOrder.Descending, "inspection_date")))
@@ -57,15 +60,15 @@ final class RestaurantInspectionConsumer {
                                         .setLimit(pageSize)
                                         .build())
                         .getEntityInputStream(),
-                (final InputStream in) -> {
-                    Iterable<RestaurantInspection> it = JsonIterable.from(in, RestaurantInspection.class);
+                in -> {
+                    final Iterable<RestaurantInspection> it = JsonIterable.from(in, RestaurantInspection.class);
                     if (Iterables.isEmpty(it)) {
                         return Observable.empty();
                     }
 
                     return Observable.fromIterable(it).concatWith(getAll(pageNumber + 1));
                 },
-                in -> in.close()
+                InputStream::close
         ));
     }
 }

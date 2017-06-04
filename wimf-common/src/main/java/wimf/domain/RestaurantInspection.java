@@ -34,7 +34,10 @@ public class RestaurantInspection {
     @NotEmptyString
     public final String cuisine;
 
+    @NotEmptyString
     public final String violationCode;
+
+    public final String inspectionType;
 
     public final int score;
 
@@ -45,7 +48,9 @@ public class RestaurantInspection {
                                 final String businessID,
                                 final String cuisine,
                                 final String violationCode,
-                                final int score) {
+                                final int score,
+                                final String inspectionType) {
+
         this.businessName = businessName;
         this.boro = boro;
         this.grade = grade;
@@ -59,6 +64,7 @@ public class RestaurantInspection {
         this.cuisine = cuisine;
         this.violationCode = violationCode;
         this.score = score;
+        this.inspectionType = inspectionType;
     }
 
     public static void save(final RestaurantInspectionDao dao, final RestaurantInspection inspection) {
@@ -113,6 +119,10 @@ public class RestaurantInspection {
 
     public String getViolationCode() {
         return violationCode;
+    }
+
+    public String getInspectionType() {
+        return inspectionType;
     }
 
     public int getScore() {

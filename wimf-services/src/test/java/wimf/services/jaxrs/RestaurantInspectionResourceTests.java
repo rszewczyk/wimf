@@ -271,7 +271,8 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
                         "businessA",
                         "Food Type 3",
                         "1A",
-                        23),
+                        23,
+                        "type 1"),
                 new RestaurantInspection(
                         "Business B",
                         "Boro 3",
@@ -280,7 +281,8 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
                         "businessB",
                         "Food Type 1",
                         "3B",
-                        16),
+                        16,
+                        "type 2"),
                 new RestaurantInspection(
                         "Business A",
                         "Boro 3",
@@ -289,7 +291,8 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
                         "businessA",
                         "Food Type 3",
                         "3B",
-                        7),
+                        7,
+                        "type 1"),
                 new RestaurantInspection(
                         "Business D",
                         "Boro 2",
@@ -298,7 +301,8 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
                         "businessD",
                         "Food Type 2",
                         "1A",
-                        7),
+                        7,
+                        "type 1"),
                 new RestaurantInspection(
                         "Business D",
                         "Boro 2",
@@ -307,7 +311,8 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
                         "businessD",
                         "Food Type 1",
                         "2A",
-                        14)
+                        14,
+                        "type 3")
         );
     }
 }

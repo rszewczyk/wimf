@@ -32,7 +32,8 @@ public final class PostgresDatabase implements Database {
                     "business_id VARCHAR, " +
                     "cuisine VARCHAR, " +
                     "violation_code VARCHAR, " +
-                    "score INTEGER)");
+                    "score INTEGER, " +
+                    "inspection_type VARCHAR)");
         }
     }
 

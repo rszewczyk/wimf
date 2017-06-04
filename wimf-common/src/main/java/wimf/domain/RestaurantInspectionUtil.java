@@ -11,10 +11,19 @@ final class RestaurantInspectionUtil {
     static final String SORT_ASC = "ASC";
     static final String SORT_DESC = "DESC";
 
+    /**
+     * White list of fields that are allowed to appear as column names in order by/where clauses
+     */
     final static Set<String> VALID_FIELDS = ImmutableSet.of("inspection_date", "boro",
             "business_id", "cuisine", "violation_code", "score", "grade",
-            "business_name");
+            "business_name", "inspection_type");
 
+    /**
+     * builds an order by clause
+     *
+     * @param sort
+     * @return
+     */
     static String getOrderByClause(final List<String> sort) {
         if (sort.isEmpty()) {
             return "inspection_date DESC";
@@ -23,6 +32,12 @@ final class RestaurantInspectionUtil {
         return String.join(" ", sort);
     }
 
+    /**
+     * builds a parameterized where clause
+     *
+     * @param filter
+     * @return
+     */
     static String getWhereClause(final List<String> filter) {
         if (filter.isEmpty()) {
             return "";
@@ -57,6 +72,12 @@ final class RestaurantInspectionUtil {
         return String.join(" AND ", clauses);
     }
 
+    /**
+     * Gathers the filter values into a map keyed by the named parameter (:filter1, :filter2, etc)
+     *
+     * @param filter
+     * @return
+     */
     static Map<String, Object> getWhereValues(List<String> filter) {
         final Map<String, Object> vals = new HashMap<>();
 

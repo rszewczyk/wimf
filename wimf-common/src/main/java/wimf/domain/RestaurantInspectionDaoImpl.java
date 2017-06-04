@@ -74,9 +74,10 @@ public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
                         "business_id, " +
                         "cuisine, " +
                         "violation_code, " +
-                        "score) " +
+                        "score, " +
+                        "inspection_type) " +
                 "VALUES (:businessName, :boro, :grade, :inspectionDate, " +
-                        ":businessID, :cuisine, :violationCode, :score)")
+                        ":businessID, :cuisine, :violationCode, :score, :inspectionType)")
         void insert(@BindBean RestaurantInspection inspection);
 
         @RegisterRowMapper(RestaurantInspectionMapper.class)
@@ -101,14 +102,16 @@ public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     static public class RestaurantInspectionMapper implements RowMapper<RestaurantInspection> {
         @Override
         public RestaurantInspection map(final ResultSet r, final StatementContext ctx) throws SQLException {
-            return new RestaurantInspection(r.getString("business_name"),
+            return new RestaurantInspection(
+                    r.getString("business_name"),
                     r.getString("boro"),
                     r.getString("grade"),
                     r.getTimestamp("inspection_date").toLocalDateTime(),
                     r.getString("business_id"),
                     r.getString("cuisine"),
                     r.getString("violation_code"),
-                    r.getInt("score"));
+                    r.getInt("score"),
+                    r.getString("inspection_type"));
         }
     }
 

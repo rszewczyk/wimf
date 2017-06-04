@@ -31,7 +31,8 @@ public final class HsqlDatabase implements Database {
                     "business_id VARCHAR(255), " +
                     "cuisine VARCHAR(255), " +
                     "violation_code VARCHAR(255), " +
-                    "score INTEGER)");
+                    "score INTEGER, "+
+                    "inspection_type VARCHAR(255))");
         }
     }
 

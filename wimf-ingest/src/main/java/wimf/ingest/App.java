@@ -114,7 +114,8 @@ public class App {
                                     ri.businessID,
                                     ri.cuisine,
                                     ri.violationCode,
-                                    ri.score
+                                    ri.score,
+                                    ri.inspectionType
                             )
                     ));
 

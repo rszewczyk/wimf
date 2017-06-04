@@ -23,9 +23,16 @@ public class RestaurantInspectionTests {
 
     @Test
     public void it_correctly_passes_validation_and_saves_in_db() {
-        RestaurantInspection inspection = new RestaurantInspection("some business", "some boro",
-                "A", LocalDateTime.now(), "some business ID", "some cuisine",
-                "some violation code", 23);
+        RestaurantInspection inspection = new RestaurantInspection(
+                "some business",
+                "some boro",
+                "A",
+                LocalDateTime.now(),
+                "some business ID",
+                "some cuisine",
+                "some violation code",
+                23,
+                "some inspection type");
 
         // when save is called
         RestaurantInspection.save(dao, inspection);
@@ -39,9 +46,16 @@ public class RestaurantInspectionTests {
     @Test
     public void it_correctly_fails_validation_and_is_not_saved_in_db() {
         // boro cannot be a blank string
-        RestaurantInspection inspection = new RestaurantInspection("some business", "",
-                "A", LocalDateTime.now(), "some business ID", "some cuisine",
-                "some violation code", 23);
+        RestaurantInspection inspection = new RestaurantInspection(
+                "some business",
+                "", // boro can't be blank
+                "A",
+                LocalDateTime.now(),
+                "some business ID",
+                "some cuisine",
+                "some violation code",
+                23,
+                "some inspection type");
 
         // when save is called then a Validation error occurs
         assertThatExceptionOfType(ConstraintViolationException.class)
