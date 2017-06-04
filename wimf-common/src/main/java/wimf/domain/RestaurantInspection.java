@@ -2,10 +2,11 @@ package wimf.domain;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,6 +14,8 @@ import java.util.Set;
  * business logic here - just some validation for certain properties
  */
 public class RestaurantInspection {
+
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     private String businessName;
 
@@ -84,15 +87,28 @@ public class RestaurantInspection {
         this.score = score;
     }
 
-    public static void save(final RestaurantInspection inspection,
-                     final RestaurantInspectionDao dao,
-                     final Validator validator) {
+    public static void save(final RestaurantInspectionDao dao, final RestaurantInspection inspection) {
         final Set<ConstraintViolation<RestaurantInspection>> cv = validator.validate(inspection);
 
         if (cv.size() > 0) {
-            throw new ConstraintViolationException("validation failed", Collections.unmodifiableSet(cv));
+            throw new ConstraintViolationException("invalid inspection", cv);
         }
 
         dao.insert(inspection);
+    }
+
+    public static List<RestaurantInspection> getPage(final RestaurantInspectionDao dao,
+                                                     final PageParams params) {
+        final Set<ConstraintViolation<PageParams>> cv = validator.validate(params);
+
+        if (cv.size() > 0) {
+            throw new ConstraintViolationException("invalid query parameters", cv);
+        }
+
+        return dao.fetchPage(params.limit, params.offset, params.sort, params.filter);
+    }
+
+    public static long count(final RestaurantInspectionDao dao) {
+        return dao.count();
     }
 }

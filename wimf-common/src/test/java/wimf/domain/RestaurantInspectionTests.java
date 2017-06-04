@@ -14,13 +14,11 @@ import java.time.LocalDateTime;
  * tests for {@link RestaurantInspection}
  */
 public class RestaurantInspectionTests {
-    private Validator validator;
     private RestaurantInspectionDao dao;
 
     @Before
     public void before() {
         dao = mock(RestaurantInspectionDao.class);
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
@@ -30,7 +28,7 @@ public class RestaurantInspectionTests {
                 "some violation code", 23);
 
         // when save is called
-        RestaurantInspection.save(inspection, dao, validator);
+        RestaurantInspection.save(dao, inspection);
 
         // then no exception has been thrown
 
@@ -47,7 +45,7 @@ public class RestaurantInspectionTests {
 
         // when save is called then a Validation error occurs
         assertThatExceptionOfType(ConstraintViolationException.class)
-                .isThrownBy(() -> RestaurantInspection.save(inspection, dao, validator));
+                .isThrownBy(() -> RestaurantInspection.save(dao, inspection));
 
         // and the inspection was not saved in the database
         verify(dao, times(0)).insert(any(RestaurantInspection.class));

@@ -7,8 +7,16 @@ import java.util.List;
  * meant to combine with the JDBI attached interfaces so that consumers can have
  * control over the resource lifecycle without dealing directly with JDBI
  */
-public interface RestaurantInspectionDao extends AutoCloseable {
-    void insert(RestaurantInspection inspection);
-    List<RestaurantInspection> fetchPage(int limit, int offset);
-    long count();
+public abstract class RestaurantInspectionDao implements AutoCloseable {
+    abstract protected void insert(RestaurantInspection inspection);
+
+    abstract protected List<RestaurantInspection> fetchPage(final int limit,
+                                                            final int offset,
+                                                            final List<String> sort);
+
+    abstract protected List<RestaurantInspection> fetchPage(final int limit,
+                                                            final int offset,
+                                                            final List<String> sort,
+                                                            final List<String> filter);
+    abstract protected long count();
 }

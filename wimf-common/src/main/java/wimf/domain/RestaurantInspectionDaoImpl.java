@@ -1,19 +1,23 @@
 package wimf.domain;
 
+import com.google.common.base.Strings;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.customizer.BindMap;
+import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
-public final class RestaurantInspectionDaoImpl implements RestaurantInspectionDao {
+public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     private final RestaurantInspectionJdbiDao dao;
     private final Handle handle;
 
@@ -23,17 +27,35 @@ public final class RestaurantInspectionDaoImpl implements RestaurantInspectionDa
     }
 
     @Override
-    public void insert(final RestaurantInspection inspection) {
+    protected void insert(final RestaurantInspection inspection) {
         dao.insert(inspection);
     }
 
     @Override
-    public List<RestaurantInspection> fetchPage(final int limit, final int offset) {
-        return dao.fetchPage(limit, offset);
+    protected List<RestaurantInspection> fetchPage(final int limit,
+                                                   final int offset,
+                                                   final List<String> sort) {
+        return dao.fetchPage(limit, offset, RestaurantInspectionUtil.getOrderByClause(sort));
     }
 
     @Override
-    public long count() {
+    protected List<RestaurantInspection> fetchPage(final int limit,
+                                                   final int offset,
+                                                   final List<String> sort,
+                                                   final List<String> filter) {
+
+        final String wc = RestaurantInspectionUtil.getWhereClause(filter);
+
+        return dao.fetchPage(
+                limit,
+                offset,
+                RestaurantInspectionUtil.getOrderByClause(sort),
+                Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
+                RestaurantInspectionUtil.getWhereValues(filter));
+    }
+
+    @Override
+    protected long count() {
         return dao.count();
     }
 
@@ -58,8 +80,18 @@ public final class RestaurantInspectionDaoImpl implements RestaurantInspectionDa
         void insert(@BindBean RestaurantInspection inspection);
 
         @RegisterRowMapper(RestaurantInspectionMapper.class)
-        @SqlQuery("SELECT * from restaurant_inspection LIMIT :limit OFFSET :offset")
-        List<RestaurantInspection> fetchPage(@Bind("limit") int limit, @Bind("offset") int offset);
+        @SqlQuery("SELECT * from restaurant_inspection ORDER BY <order> LIMIT :limit OFFSET :offset")
+        List<RestaurantInspection> fetchPage(@Bind("limit") int limit,
+                                             @Bind("offset") int offset,
+                                             @Define("order") String order);
+
+        @RegisterRowMapper(RestaurantInspectionMapper.class)
+        @SqlQuery("SELECT * from restaurant_inspection <where> ORDER BY <order> LIMIT :limit OFFSET :offset")
+        List<RestaurantInspection> fetchPage(@Bind("limit") int limit,
+                                             @Bind("offset") int offset,
+                                             @Define("order") String order,
+                                             @Define("where") String where,
+                                             @BindMap Map<String, Object> whereVals);
 
         @RegisterRowMapper(CountMapper.class)
         @SqlQuery("SELECT count(*) from restaurant_inspection")

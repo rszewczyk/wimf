@@ -1,10 +1,11 @@
 package wimf.services.jaxrs;
 
 import wimf.domain.Database;
+import wimf.domain.RestaurantInspection;
 import wimf.domain.RestaurantInspectionDao;
-import wimf.services.dto.ListDTO;
+import wimf.services.dto.ResultSetDTO;
 import wimf.services.dto.RestaurantInspectionDTO;
-import wimf.services.dto.WimfQueryDto;
+import wimf.services.dto.InspectionQueryDTO;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -20,14 +21,16 @@ public class RestaurantInspectionResource {
     }
 
     @BeanParam
-    private WimfQueryDto query;
+    private InspectionQueryDTO query;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ListDTO<RestaurantInspectionDTO> getPage() throws Exception {
+    public ResultSetDTO getPage() throws Exception {
 
         try(final RestaurantInspectionDao dao = db.getRestaurantInspectionDao()) {
-            return RestaurantInspectionDTO.fromModels(dao.count(), dao.fetchPage(query.limit, query.offset));
+            return RestaurantInspectionDTO.fromModels(
+                    RestaurantInspection.count(dao),
+                    RestaurantInspection.getPage(dao, query.toPageParams()));
         }
     }
 }

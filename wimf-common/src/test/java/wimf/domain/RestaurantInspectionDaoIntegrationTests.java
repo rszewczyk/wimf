@@ -1,12 +1,14 @@
 package wimf.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,29 +29,29 @@ public class RestaurantInspectionDaoIntegrationTests {
     @Test
     public void it_inserts_inspections() {
         // given some test inspections (TEST_DATA) and an empty database
-        assertThat(dao.fetchPage(10, 10)).isEmpty();
+        assertThat(dao.fetchPage(10, 10, Collections.emptyList())).isEmpty();
 
         // when we insert them
         TEST_DATA.forEach(dao::insert);
 
         // then they are in the database
-        assertThat(dao.fetchPage(10, 0)).hasSize(2);
+        assertThat(dao.fetchPage(10, 0, Collections.emptyList())).hasSize(2);
     }
 
     @Test
     public void it_fetches_pages() {
         // given there are two inspections in the database
         TEST_DATA.forEach(dao::insert);
-        assertThat(dao.fetchPage(10, 0)).hasSize(2);
+        assertThat(dao.fetchPage(10, 0, Collections.emptyList())).hasSize(2);
 
         // when we fetch a page of size 1
-        final List<RestaurantInspection> firstPage = dao.fetchPage(1, 0);
+        final List<RestaurantInspection> firstPage = dao.fetchPage(1, 0, Collections.emptyList());
 
         // then we get 1 result
         assertThat(firstPage).hasSize(1);
 
         // when we fetch a page of size 2 at the next offset
-        final List<RestaurantInspection> secondPage = dao.fetchPage(2, 1);
+        final List<RestaurantInspection> secondPage = dao.fetchPage(2, 1, Collections.emptyList());
 
         // then we get 1 result
         assertThat(secondPage).hasSize(1);
