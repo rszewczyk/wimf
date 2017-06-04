@@ -1,7 +1,7 @@
 package wimf.services.jaxrs;
 
 import wimf.domain.Database;
-import wimf.domain.PageParams;
+import wimf.domain.QueryParams;
 import wimf.domain.RestaurantInspection;
 import wimf.domain.RestaurantInspectionDao;
 import wimf.services.dto.ResultSetDTO;
@@ -40,7 +40,7 @@ public class RestaurantInspectionResource {
         try(final RestaurantInspectionDao dao = db.getRestaurantInspectionDao()) {
             return RestaurantInspectionDTO.fromModels(
                     RestaurantInspection.count(dao),
-                    RestaurantInspection.getPage(dao, new PageParams(limit, offset, sort, filter)));
+                    RestaurantInspection.query(dao, new QueryParams(limit, offset, sort, filter)));
         }
     }
 }

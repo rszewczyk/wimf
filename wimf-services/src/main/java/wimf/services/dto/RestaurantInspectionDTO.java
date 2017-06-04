@@ -20,14 +20,14 @@ public final class RestaurantInspectionDTO {
 
     public static RestaurantInspectionDTO fromModel(final RestaurantInspection inspection) {
         return new RestaurantInspectionDTO(
-                inspection.getBusinessName(),
-                inspection.getBoro(),
-                inspection.getGrade(),
-                inspection.getInspectionDate(),
-                inspection.getBusinessID(),
-                inspection.getCuisine(),
-                inspection.getViolationCode(),
-                inspection.getScore());
+                inspection.businessName,
+                inspection.boro,
+                inspection.grade,
+                inspection.inspectionDate,
+                inspection.businessID,
+                inspection.cuisine,
+                inspection.violationCode,
+                inspection.score);
     }
 
     public static ResultSetDTO fromModels(final long count,
