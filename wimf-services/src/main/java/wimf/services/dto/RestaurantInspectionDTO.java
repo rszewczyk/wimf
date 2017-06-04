@@ -9,16 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class RestaurantInspectionDTO {
-    public final String businessName;
-    public final String boro;
-    public final String grade;
-    public final LocalDateTime inspectionDate;
-    public final String businessID;
-    public final String cuisine;
-    public final String violationCode;
-    public final int score;
-    public final String inspectionType;
-
     public static RestaurantInspectionDTO fromModel(final RestaurantInspection inspection) {
         return new RestaurantInspectionDTO(
                 inspection.businessName,
@@ -37,6 +27,16 @@ public final class RestaurantInspectionDTO {
                 .map(RestaurantInspectionDTO::fromModel)
                 .collect(Collectors.toList());
     }
+
+    public final String businessName;
+    public final String boro;
+    public final String grade;
+    public final LocalDateTime inspectionDate;
+    public final String businessID;
+    public final String cuisine;
+    public final String violationCode;
+    public final int score;
+    public final String inspectionType;
 
     @JsonCreator
     public static RestaurantInspectionDTO of(@JsonProperty("businessName") final String businessName,

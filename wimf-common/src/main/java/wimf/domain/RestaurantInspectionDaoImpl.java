@@ -55,8 +55,12 @@ public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     }
 
     @Override
-    protected long count() {
-        return dao.count();
+    protected long count(final List<String> filter) {
+        final String wc = RestaurantInspectionUtil.getWhereClause(filter);
+
+        return dao.count(
+                Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
+                RestaurantInspectionUtil.getWhereValues(filter));
     }
 
     @Override
@@ -95,8 +99,9 @@ public final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
                                              @BindMap Map<String, Object> whereVals);
 
         @RegisterRowMapper(CountMapper.class)
-        @SqlQuery("SELECT count(*) from restaurant_inspection")
-        long count();
+        @SqlQuery("SELECT count(*) from restaurant_inspection <where>")
+        long count(@Define("where") String where,
+                   @BindMap Map<String, Object> whereVals);
     }
 
     static public class RestaurantInspectionMapper implements RowMapper<RestaurantInspection> {

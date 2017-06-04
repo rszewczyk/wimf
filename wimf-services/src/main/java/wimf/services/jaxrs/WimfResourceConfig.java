@@ -11,6 +11,7 @@ public class WimfResourceConfig extends ResourceConfig {
         }
         register(new ObjectMapperBinder());
         register(RestaurantInspectionResource.class);
+        register(RestaurantInspectionsSummaryResource.class);
         register(ObjectMapperProvider.class);
         register(ConstraintViolationExceptionMapper.class);
     }

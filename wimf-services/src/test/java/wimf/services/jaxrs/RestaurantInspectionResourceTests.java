@@ -1,20 +1,15 @@
 package wimf.services.jaxrs;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
 import org.junit.Test;
 import wimf.domain.Database;
 import wimf.domain.HsqlDatabase;
 import wimf.domain.RestaurantInspection;
 import wimf.domain.RestaurantInspectionDao;
-import wimf.services.ObjectMapperFactory;
 import wimf.services.dto.RestaurantInspectionDTO;
 
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,8 +21,10 @@ import java.util.List;
 /**
  * tests for {@link RestaurantInspectionResource}
  */
-public class RestaurantInspectionResourceTests extends JerseyTest {
+public class RestaurantInspectionResourceTests extends ResourceTest {
     private final Database db;
+
+    static final String PATH = "/api/inspection";
 
     public RestaurantInspectionResourceTests() throws Exception {
         super();
@@ -42,23 +39,15 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
     }
 
     @Override
-    protected Application configure() {
-        // always pick an available port
-        forceSet(TestProperties.CONTAINER_PORT, "0");
-
-        return new WimfResourceConfig(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bind(db).to(Database.class);
-            }
-        }).getApplication();
-    }
-
-    @Override
-    protected void configureClient(final ClientConfig config) {
-        final ObjectMapper mapper = new ObjectMapperFactory().provide();
-        final ObjectMapperProvider provider = new ObjectMapperProvider(mapper);
-        config.register(provider);
+    Binder[] getModules() {
+        return new Binder[]{
+                new AbstractBinder() {
+                    @Override
+                    protected void configure() {
+                        bind(db).to(Database.class);
+                    }
+                }
+        };
     }
 
     @Test
@@ -66,7 +55,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         // given the database contains 5 inspections
 
         // when get the first 2
-        final List<RestaurantInspectionDTO> first = target("/api/inspection")
+        final List<RestaurantInspectionDTO> first = target(PATH)
                 .queryParam("limit", "2")
                 .queryParam("offset", "0")
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -77,7 +66,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         assertThat(first).hasSize(2);
 
         // when get the next 5
-        final List<RestaurantInspectionDTO> second = target("/api/inspection")
+        final List<RestaurantInspectionDTO> second = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "2")
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -93,7 +82,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         // given the database contains 5 inspections
 
         // when get all filtered by grade = A
-        final List<RestaurantInspectionDTO> byGrade = target("/api/inspection")
+        final List<RestaurantInspectionDTO> byGrade = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter", "grade=A")
@@ -108,7 +97,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
 
         // when get all filtered by inspection_date > 2016-04-01, score = 7
         final LocalDateTime filterDate = LocalDateTime.of(2016, 4, 1, 0, 0);
-        final List<RestaurantInspectionDTO> byDateAndScore = target("/api/inspection")
+        final List<RestaurantInspectionDTO> byDateAndScore = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter",
@@ -127,7 +116,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         });
 
         // when get all filtered by boro = Boro 1|Boro3
-        final List<RestaurantInspectionDTO> byBoro = target("/api/inspection")
+        final List<RestaurantInspectionDTO> byBoro = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter", "boro=Boro 1", "boro=Boro 3")
@@ -147,7 +136,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         // given the database contains 5 inspections
 
         // when get all with an improperly formatted filter
-        final Response malformed = target("/api/inspection")
+        final Response malformed = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter", "grade-A")
@@ -159,7 +148,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         assertThat(malformed.readEntity(String.class)).contains("Malformed filter `grade-A`");
 
         // when get all with an unknown filter
-        final Response unknownFilter = target("/api/inspection")
+        final Response unknownFilter = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter", "foo=bar")
@@ -171,7 +160,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         assertThat(unknownFilter.readEntity(String.class)).contains("Unknown filter field `foo`");
 
         // when get all with an invalid filter value (score must be an integer)
-        final Response invalidValue = target("/api/inspection")
+        final Response invalidValue = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter", "score=bar")
@@ -188,7 +177,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         // given the database contains 5 inspections
 
         // when get all sorted by date ascending
-        final List<RestaurantInspectionDTO> byDate = target("/api/inspection")
+        final List<RestaurantInspectionDTO> byDate = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("sort", "inspection_date ASC")
@@ -211,7 +200,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
 
         // when get all with improperly formatted sort
         // when get all with an improperly formatted filter
-        final Response malformed = target("/api/inspection")
+        final Response malformed = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("sort", "inspection_date")
@@ -223,7 +212,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         assertThat(malformed.readEntity(String.class)).contains("Malformed sort parameter `inspection_date`");
 
         // when get all with an unknown filter
-        final Response unknown = target("/api/inspection")
+        final Response unknown = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("sort", "foo ASC")
@@ -235,7 +224,7 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         assertThat(unknown.readEntity(String.class)).contains("Unknown sort field `foo`");
 
         // when get all with an invalid filter value (score must be an integer)
-        final Response invalidOrder = target("/api/inspection")
+        final Response invalidOrder = target(PATH)
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("sort", "score DES")

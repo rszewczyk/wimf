@@ -88,10 +88,6 @@ public class RestaurantInspection {
         return dao.fetchPage(params.limit, params.offset, params.sort, params.filter);
     }
 
-    public static long count(final RestaurantInspectionDao dao) {
-        return dao.count();
-    }
-
     // JDBI BindBean needs getters
     public String getBusinessName() {
         return businessName;
