@@ -32,13 +32,10 @@ public final class RestaurantInspectionDTO {
                 inspection.inspectionType);
     }
 
-    public static ResultSetDTO fromModels(final long count,
-                                          final List<RestaurantInspection> inspections) {
-        return ResultSetDTO.from(
-                count,
-                inspections.stream()
-                        .map(RestaurantInspectionDTO::fromModel)
-                        .collect(Collectors.toList()));
+    public static List<RestaurantInspectionDTO> fromModels(final List<RestaurantInspection> inspections) {
+        return inspections.stream()
+                .map(RestaurantInspectionDTO::fromModel)
+                .collect(Collectors.toList());
     }
 
     @JsonCreator

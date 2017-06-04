@@ -12,7 +12,6 @@ import wimf.domain.HsqlDatabase;
 import wimf.domain.RestaurantInspection;
 import wimf.domain.RestaurantInspectionDao;
 import wimf.services.ObjectMapperFactory;
-import wimf.services.dto.ResultSetDTO;
 import wimf.services.dto.RestaurantInspectionDTO;
 
 import javax.ws.rs.core.Application;
@@ -67,31 +66,26 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         // given the database contains 5 inspections
 
         // when get the first 2
-        final ResultSetDTO first = target("/api/inspection")
+        final List<RestaurantInspectionDTO> first = target("/api/inspection")
                 .queryParam("limit", "2")
                 .queryParam("offset", "0")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .buildGet()
-                .invoke(ResultSetDTO.class);
+                .invoke(new GenericType<List<RestaurantInspectionDTO>>() {});
 
         // then returns 2 inspections
-        assertThat(first.items).hasSize(2);
-        // and total is 5
-        assertThat(first.total).isEqualTo(5);
-
+        assertThat(first).hasSize(2);
 
         // when get the next 5
-        final ResultSetDTO second = target("/api/inspection")
+        final List<RestaurantInspectionDTO> second = target("/api/inspection")
                 .queryParam("limit", "5")
                 .queryParam("offset", "2")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .buildGet()
-                .invoke(ResultSetDTO.class);
+                .invoke(new GenericType<List<RestaurantInspectionDTO>>() {});
 
         // then returns 3 inspections
-        assertThat(second.items).hasSize(3);
-        // and total is 5
-        assertThat(second.total).isEqualTo(5);
+        assertThat(second).hasSize(3);
     }
 
     @Test
@@ -99,24 +93,22 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         // given the database contains 5 inspections
 
         // when get all filtered by grade = A
-        final ResultSetDTO byGrade = target("/api/inspection")
+        final List<RestaurantInspectionDTO> byGrade = target("/api/inspection")
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter", "grade=A")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .buildGet()
-                .invoke(ResultSetDTO.class);
+                .invoke(new GenericType<List<RestaurantInspectionDTO>>() {});
 
         // then returns 2 inspections
-        assertThat(byGrade.items).hasSize(2);
-        // and total is 5
-        assertThat(byGrade.total).isEqualTo(5);
+        assertThat(byGrade).hasSize(2);
         // and all inspections have a grade of A
-        byGrade.items.forEach(i -> assertThat(i.grade).isEqualTo("A"));
+        byGrade.forEach(i -> assertThat(i.grade).isEqualTo("A"));
 
         // when get all filtered by inspection_date > 2016-04-01, score = 7
         final LocalDateTime filterDate = LocalDateTime.of(2016, 4, 1, 0, 0);
-        final ResultSetDTO byDateAndScore = target("/api/inspection")
+        final List<RestaurantInspectionDTO> byDateAndScore = target("/api/inspection")
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter",
@@ -124,33 +116,29 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
                         "inspection_date>" + filterDate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .buildGet()
-                .invoke(ResultSetDTO.class);
+                .invoke(new GenericType<List<RestaurantInspectionDTO>>() {});
 
         // then returns 2 inspections
-        assertThat(byDateAndScore.items).hasSize(2);
-        // and total is 5
-        assertThat(byDateAndScore.total).isEqualTo(5);
+        assertThat(byDateAndScore).hasSize(2);
         // and all inspections have a score of 7 and occurred after 4/1/2016
-        byDateAndScore.items.forEach(i -> {
+        byDateAndScore.forEach(i -> {
             assertThat(i.score).isEqualTo(7);
             assertThat(i.inspectionDate).isAfter(filterDate);
         });
 
         // when get all filtered by boro = Boro 1|Boro3
-        final ResultSetDTO byBoro = target("/api/inspection")
+        final List<RestaurantInspectionDTO> byBoro = target("/api/inspection")
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("filter", "boro=Boro 1", "boro=Boro 3")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .buildGet()
-                .invoke(ResultSetDTO.class);
+                .invoke(new GenericType<List<RestaurantInspectionDTO>>() {});
 
         // then returns 3 inspections
-        assertThat(byBoro.items).hasSize(3);
-        // and total is 5
-        assertThat(byBoro.total).isEqualTo(5);
+        assertThat(byBoro).hasSize(3);
         // and all inspections were in either Boro 1 or Boro 3
-        byBoro.items.forEach(i -> assertThat(i.boro)
+        byBoro.forEach(i -> assertThat(i.boro)
                 .isIn(Arrays.asList("Boro 1", "Boro 3")));
     }
 
@@ -200,22 +188,20 @@ public class RestaurantInspectionResourceTests extends JerseyTest {
         // given the database contains 5 inspections
 
         // when get all sorted by date ascending
-        final ResultSetDTO byDate = target("/api/inspection")
+        final List<RestaurantInspectionDTO> byDate = target("/api/inspection")
                 .queryParam("limit", "5")
                 .queryParam("offset", "0")
                 .queryParam("sort", "inspection_date ASC")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .buildGet()
-                .invoke(ResultSetDTO.class);
+                .invoke(new GenericType<List<RestaurantInspectionDTO>>() {});
 
         // then returns 5 inspections
-        assertThat(byDate.items).hasSize(5);
-        // and total is 5
-        assertThat(byDate.total).isEqualTo(5);
+        assertThat(byDate).hasSize(5);
         // and the inspections are sorted by date, ascending
-        for(int i = 1; i < byDate.items.size(); i++) {
-            assertThat(byDate.items.get(i).inspectionDate)
-                    .isAfter(byDate.items.get(i - 1).inspectionDate);
+        for(int i = 1; i < byDate.size(); i++) {
+            assertThat(byDate.get(i).inspectionDate)
+                    .isAfter(byDate.get(i - 1).inspectionDate);
         }
     }
 

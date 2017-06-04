@@ -1,10 +1,12 @@
 package wimf.domain;
 
+import com.google.common.collect.ImmutableList;
+
 import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
- * Holds and validates query params for the inspection collection
+ * Holds and validates parameters for an inspection query
  */
 final public class QueryParams {
 
@@ -27,7 +29,7 @@ final public class QueryParams {
 
         this.limit = limit;
         this.offset = offset;
-        this.sort = sort;
-        this.filter = filter;
+        this.sort = ImmutableList.copyOf(sort);
+        this.filter = ImmutableList.copyOf(filter);
     }
 }

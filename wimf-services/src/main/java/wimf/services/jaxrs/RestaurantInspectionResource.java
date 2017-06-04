@@ -4,7 +4,6 @@ import wimf.domain.Database;
 import wimf.domain.QueryParams;
 import wimf.domain.RestaurantInspection;
 import wimf.domain.RestaurantInspectionDao;
-import wimf.services.dto.ResultSetDTO;
 import wimf.services.dto.RestaurantInspectionDTO;
 
 import javax.inject.Inject;
@@ -35,11 +34,10 @@ public class RestaurantInspectionResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultSetDTO getPage() throws Exception {
+    public List<RestaurantInspectionDTO> getPage() throws Exception {
 
         try(final RestaurantInspectionDao dao = db.getRestaurantInspectionDao()) {
             return RestaurantInspectionDTO.fromModels(
-                    RestaurantInspection.count(dao),
                     RestaurantInspection.query(dao, new QueryParams(limit, offset, sort, filter)));
         }
     }

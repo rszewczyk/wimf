@@ -14,9 +14,8 @@ final class RestaurantInspectionUtil {
     /**
      * White list of fields that are allowed to appear as column names in order by/where clauses
      */
-    final static Set<String> VALID_FIELDS = ImmutableSet.of("inspection_date", "boro",
-            "business_id", "cuisine", "violation_code", "score", "grade",
-            "business_name", "inspection_type");
+    final static Set<String> VALID_FIELDS = ImmutableSet.of("inspection_date", "boro", "business_id",
+            "cuisine", "violation_code", "score", "grade", "business_name", "inspection_type");
 
     /**
      * builds an order by clause
