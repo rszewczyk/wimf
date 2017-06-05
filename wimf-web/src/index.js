@@ -2,5 +2,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
+import wrapWithFetcher from "./fetcher";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+const FetchApp = wrapWithFetcher()(App);
+
+ReactDOM.render(
+  <FetchApp initialRequest="/api/summary" />,
+  document.getElementById("root")
+);

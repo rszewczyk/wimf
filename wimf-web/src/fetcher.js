@@ -6,16 +6,18 @@ export type FetchState = {
   loading: boolean,
   fetchedAt: number,
   data: any,
-  error:
-    | {
-        message: string
-      }
-    | null,
+  error: {
+    message: string
+  } | null,
   headers: Headers
 };
 
+export type FetcherComponentProps = FetchState & {
+  fetch: (Request | string) => Promise<any>
+};
+
 type FetcherProps = {
-  request: Request | string,
+  initialRequest?: Request | string,
   baseRef?: HTMLElement => void
 };
 
@@ -40,11 +42,11 @@ export default function wrapWithFetcher(
 
   return (
     Wrapped:
-      | Class<React$Component<void, FetchState, any>>
-      | ((props: FetchState) => ?React$Element<any>)
+      | Class<React$Component<void, FetcherComponentProps, any>>
+      | ((props: FetcherComponentProps) => ?React$Element<any>)
   ) => {
-    class Fetcher extends Component<void, FetcherProps, FetchState> {
-      state = {
+    class Fetcher extends Component {
+      state: FetchState = {
         loading: false,
         fetchedAt: 0,
         data: null,
@@ -52,7 +54,9 @@ export default function wrapWithFetcher(
         headers: new Headers()
       };
 
-      async fetch(request: Request | string) {
+      props: FetcherProps;
+
+      fetch = async (request: Request | string) => {
         this.setState({ loading: true, error: null });
         try {
           const res = await doFetch(request);
@@ -66,20 +70,22 @@ export default function wrapWithFetcher(
         } finally {
           this.setState({ loading: false });
         }
-      }
+      };
 
       componentDidMount() {
-        this.fetch(this.props.request);
-      }
-
-      componentWillReceiveProps(nextProps: FetcherProps) {
-        if (nextProps.request !== this.props.request) {
-          this.fetch(nextProps.request);
+        if (this.props.initialRequest) {
+          this.fetch(this.props.initialRequest);
         }
       }
 
       render() {
-        return <Wrapped {...this.state} ref={this.props.baseRef} />;
+        return (
+          <Wrapped
+            {...this.state}
+            ref={this.props.baseRef}
+            fetch={this.fetch}
+          />
+        );
       }
     }
 
