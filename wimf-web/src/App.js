@@ -19,16 +19,43 @@ const months = [
   "Dec"
 ];
 
-function dateMonthCounts(histograms) {
-  const keys = Object.keys(histograms);
+type Term = {
+  value: string,
+  count: number
+};
 
+type Buckets = {
+  [string]: Array<Term>
+};
+
+export function dateMonthCounts(buckets: Buckets) {
+  const keys = Object.keys(buckets);
+
+  // find the min and max date in each series - this will give us
+  // the min/max for the combined data. Note that the series are sorted
+  // by date, so we only need to check the first and last elements of each
+  // series
   const [min, max] = [
-    Math.min(...keys.map(k => new Date(histograms[k][0].value))),
-    Math.max(...keys.map(k => new Date(histograms[k].slice(-1)[0].value)))
+    Math.min(
+      ...keys
+        // filter out keys for empty series
+        .filter(k => buckets[k].length > 0)
+        // map each key to the first element of it series
+        .map(k => new Date(buckets[k][0].value))
+    ),
+    Math.max(
+      ...keys
+        // filter out keys where the array has no elements
+        .filter(k => buckets[k].length > 0)
+        // map each key to the last element element of its series
+        .map(k => new Date(buckets[k].slice(-1)[0].value))
+    )
   ];
 
+  // create a range of month buckets
   const r = [time.timeMonth(min), ...time.timeMonths(min, max)];
 
+  // initialize each bucket to zero
   const counts = {};
   r.forEach(d => {
     counts[d] = keys.reduce((acc, next) => ({ ...acc, [next]: 0 }), {
@@ -36,16 +63,18 @@ function dateMonthCounts(histograms) {
     });
   });
 
+  // for each date in each series - determine the bucket to which it belongs and
+  // add its count to the bucket count
   keys.forEach(k =>
-    histograms[k].forEach(v => {
-      counts[time.timeMonth(new Date(v.value))][k] += v.count;
+    buckets[k].forEach(b => {
+      counts[time.timeMonth(new Date(b.value))][k] += b.count;
     })
   );
 
   return r.map(d => counts[d]);
 }
 
-function termCounts(buckets, terms) {
+export function termCounts(buckets: Buckets, terms: Array<Term>) {
   const keys = Object.keys(buckets);
   const counts = {};
   terms.forEach(t => {
@@ -59,7 +88,7 @@ function termCounts(buckets, terms) {
   return terms.map(t => counts[t.value]);
 }
 
-function createRequest(filters) {
+export function createRequest(filters: Filters) {
   const queryString = Object.keys(filters)
     .map(filterName =>
       filters[filterName]
@@ -72,12 +101,14 @@ function createRequest(filters) {
   return "/api/summary?" + queryString;
 }
 
+type Filters = {
+  inspection_type: Array<string>,
+  cuisine: Array<string>,
+  boro: Array<string>
+};
+
 type AppState = {
-  filters: {
-    inspection_type: Array<string>,
-    cuisine: Array<string>,
-    boro: Array<string>
-  }
+  filters: Filters
 };
 
 export default class App extends Component {
