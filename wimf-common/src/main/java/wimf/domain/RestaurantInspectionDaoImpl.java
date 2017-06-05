@@ -6,7 +6,6 @@ import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.config.RegisterRowMapperFactory;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindMap;
@@ -62,6 +61,15 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
         final String wc = RestaurantInspectionUtil.getWhereClause(filter);
 
         return dao.count(
+                Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
+                RestaurantInspectionUtil.getWhereValues(filter));
+    }
+
+    @Override
+    protected long countGrades(final List<String> filter) {
+        final String wc = RestaurantInspectionUtil.getWhereClause(filter);
+
+        return dao.countGrades(
                 Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
                 RestaurantInspectionUtil.getWhereValues(filter));
     }
@@ -135,8 +143,17 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
 
         @RegisterRowMapper(CountMapper.class)
         @SqlQuery("SELECT count(*) from restaurant_inspection <where>")
-        long count(@Define("where") String where,
-                   @BindMap Map<String, Object> whereVals);
+        long count(@Define("where") String where, @BindMap Map<String, Object> whereVals);
+
+        @RegisterRowMapper(CountMapper.class)
+        @SqlQuery("SELECT count(*) " +
+                  "FROM (" +
+                      "SELECT inspection_date, business_id, grade, score, boro, cuisine, inspection_type " +
+                      "FROM restaurant_inspection " +
+                      "<where> " +
+                      "GROUP BY inspection_date, business_id, grade, score, boro, cuisine, inspection_type " +
+                  ") sub")
+        long countGrades(@Define("where") String where, @BindMap Map<String, Object> whereVals);
 
         @RegisterRowMapper(StringAggregationMapper.class)
         @SqlQuery(GRADE_AGG_QUERY)

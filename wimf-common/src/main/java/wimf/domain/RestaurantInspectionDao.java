@@ -27,4 +27,7 @@ public abstract class RestaurantInspectionDao implements AutoCloseable {
                                                                                                              final List<String> filter);
 
     abstract protected long count(final List<String> filter);
+
+    abstract protected long countGrades(final List<String> filter);
+
 }

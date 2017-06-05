@@ -16,23 +16,27 @@ public final class RestaurantInspectionsSummaryDTO {
         ImmutableMap.Builder<String, List<TimestampAggregationDTO>> builder = ImmutableMap.builder();
         summary.gradesByDate.forEach((k, v) -> builder.put(k, TimestampAggregationDTO.fromModels(v)));
 
-        return new RestaurantInspectionsSummaryDTO(summary.total, builder.build());
+        return new RestaurantInspectionsSummaryDTO(summary.total, summary.gradeTotal, builder.build());
     }
 
     @JsonCreator
     public static RestaurantInspectionsSummaryDTO of(
             @JsonProperty("total") final long total,
+            @JsonProperty("gradeTotal") final long gradeTotal,
             @JsonProperty("gradesByDate") final Map<String, List<TimestampAggregationDTO>> gradesByDate) {
 
-        return new RestaurantInspectionsSummaryDTO(total, ImmutableMap.copyOf(gradesByDate));
+        return new RestaurantInspectionsSummaryDTO(total, gradeTotal, ImmutableMap.copyOf(gradesByDate));
     }
 
     public final long total;
+    public final long gradeTotal;
     public final Map<String, List<TimestampAggregationDTO>> gradesByDate;
 
     private RestaurantInspectionsSummaryDTO(final long total,
+                                            final long gradeTotal,
                                             final Map<String, List<TimestampAggregationDTO>> gradesByDate) {
         this.total = total;
+        this.gradeTotal = gradeTotal;
         this.gradesByDate = gradesByDate;
     }
 

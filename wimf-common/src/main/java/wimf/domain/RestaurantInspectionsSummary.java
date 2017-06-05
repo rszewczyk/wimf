@@ -24,17 +24,22 @@ public final class RestaurantInspectionsSummary {
         if (cv.size() > 0) {
             throw new ConstraintViolationException(cv);
         }
-        final long count = dao.count(params.filters);
 
-        return new RestaurantInspectionsSummary(count, getGradesByDate(dao, params.filters));
+        final long total = dao.count(params.filters);
+        final long gradeTotal = dao.countGrades(params.filters);
+
+        return new RestaurantInspectionsSummary(total, gradeTotal, getGradesByDate(dao, params.filters));
     }
 
     public final long total;
+    public final long gradeTotal;
     public final Map<String, List<Aggregation<LocalDateTime>>> gradesByDate;
 
     RestaurantInspectionsSummary(final long total,
+                                 final long gradeTotal,
                                  final Map<String, List<Aggregation<LocalDateTime>>> gradesByDate) {
         this.total = total;
+        this.gradeTotal = gradeTotal;
         this.gradesByDate = gradesByDate;
     }
 
