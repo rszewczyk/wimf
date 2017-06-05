@@ -12,32 +12,56 @@ import java.util.Map;
 
 public final class RestaurantInspectionsSummaryDTO {
 
-    public static RestaurantInspectionsSummaryDTO fromModel(RestaurantInspectionsSummary summary) {
-        ImmutableMap.Builder<String, List<TimestampAggregationDTO>> builder = ImmutableMap.builder();
+    public static RestaurantInspectionsSummaryDTO fromModel(final RestaurantInspectionsSummary summary) {
+        final ImmutableMap.Builder<String, List<TimestampAggregationDTO>> builder = ImmutableMap.builder();
         summary.gradesByDate.forEach((k, v) -> builder.put(k, TimestampAggregationDTO.fromModels(v)));
 
-        return new RestaurantInspectionsSummaryDTO(summary.total, summary.gradeTotal, builder.build());
+        final ImmutableMap.Builder<String, List<StringAggregationDTO>> boroBuilder = ImmutableMap.builder();
+        summary.gradesByBoro.forEach((k, v) -> boroBuilder.put(k, StringAggregationDTO.fromModels(v)));
+
+        final ImmutableMap.Builder<String, List<StringAggregationDTO>> cuisineBuilder = ImmutableMap.builder();
+        summary.gradesByCuisine.forEach((k, v) -> cuisineBuilder.put(k, StringAggregationDTO.fromModels(v)));
+
+        return new RestaurantInspectionsSummaryDTO(
+                summary.total,
+                summary.gradeTotal,
+                builder.build(),
+                boroBuilder.build(),
+                cuisineBuilder.build());
     }
 
     @JsonCreator
     public static RestaurantInspectionsSummaryDTO of(
             @JsonProperty("total") final long total,
             @JsonProperty("gradeTotal") final long gradeTotal,
-            @JsonProperty("gradesByDate") final Map<String, List<TimestampAggregationDTO>> gradesByDate) {
+            @JsonProperty("gradesByDate") final Map<String, List<TimestampAggregationDTO>> gradesByDate,
+            @JsonProperty("gradesByBoro") final Map<String, List<StringAggregationDTO>> gradesByBoro,
+            @JsonProperty("gradesByCuisine") final Map<String, List<StringAggregationDTO>> gradesByCuisine) {
 
-        return new RestaurantInspectionsSummaryDTO(total, gradeTotal, ImmutableMap.copyOf(gradesByDate));
+        return new RestaurantInspectionsSummaryDTO(
+                total,
+                gradeTotal,
+                ImmutableMap.copyOf(gradesByDate),
+                ImmutableMap.copyOf(gradesByBoro),
+                ImmutableMap.copyOf(gradesByCuisine));
     }
 
     public final long total;
     public final long gradeTotal;
     public final Map<String, List<TimestampAggregationDTO>> gradesByDate;
+    public final Map<String, List<StringAggregationDTO>> gradesByBoro;
+    public final Map<String, List<StringAggregationDTO>> gradesByCuisine;
 
     private RestaurantInspectionsSummaryDTO(final long total,
                                             final long gradeTotal,
-                                            final Map<String, List<TimestampAggregationDTO>> gradesByDate) {
+                                            final Map<String, List<TimestampAggregationDTO>> gradesByDate,
+                                            final Map<String, List<StringAggregationDTO>> gradesByBoro,
+                                            final Map<String, List<StringAggregationDTO>> gradesByCuisine) {
         this.total = total;
         this.gradeTotal = gradeTotal;
         this.gradesByDate = gradesByDate;
+        this.gradesByBoro = gradesByBoro;
+        this.gradesByCuisine = gradesByCuisine;
     }
 
     public static final class TimestampAggregationDTO {
@@ -60,6 +84,32 @@ public final class RestaurantInspectionsSummaryDTO {
         public final long count;
 
         private TimestampAggregationDTO(final LocalDateTime value, final long count) {
+            this.value = value;
+            this.count = count;
+        }
+    }
+
+    public static final class StringAggregationDTO {
+
+        public static List<StringAggregationDTO> fromModels(
+                List<RestaurantInspectionsSummary.Aggregation<String>> aggs) {
+
+            return aggs.stream()
+                    .map(a -> new StringAggregationDTO(a.value, a.count))
+                    .collect(ImmutableList.toImmutableList());
+        }
+
+        @JsonCreator
+        public static StringAggregationDTO of(@JsonProperty("value") final String value,
+                                              @JsonProperty("count") final long count) {
+
+            return new StringAggregationDTO(value, count);
+        }
+
+        public final String value;
+        public final long count;
+
+        private StringAggregationDTO(final String value, final long count) {
             this.value = value;
             this.count = count;
         }
