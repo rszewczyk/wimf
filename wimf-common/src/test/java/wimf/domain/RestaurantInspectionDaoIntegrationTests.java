@@ -65,10 +65,10 @@ public class RestaurantInspectionDaoIntegrationTests {
 
         // when get grades aggregated by inspection_date
         final List<RestaurantInspectionsSummary.Aggregation<LocalDateTime>> aggs =
-            dao.getGradeDateAggregation("inspection_date", Collections.emptyList());
+            dao.getGradeDateAggregation("inspection_date", Collections.emptyList(), "A");
 
         // then we get two aggregations
-        assertThat(aggs).hasSize(2);
+        assertThat(aggs).hasSize(1);
     }
 
     @After

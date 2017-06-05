@@ -21,10 +21,12 @@ public abstract class RestaurantInspectionDao implements AutoCloseable {
                                                             final List<String> filter);
 
     abstract protected List<RestaurantInspectionsSummary.Aggregation<String>> getGradeStringAggregation(final String aggName,
-                                                                                                        final List<String> filter);
+                                                                                                        final List<String> userFilter,
+                                                                                                        final String grade);
 
     abstract protected List<RestaurantInspectionsSummary.Aggregation<LocalDateTime>> getGradeDateAggregation(final String aggName,
-                                                                                                             final List<String> filter);
+                                                                                                             final List<String> userFilter,
+                                                                                                             final String grade);
 
     abstract protected long count(final List<String> filter);
 

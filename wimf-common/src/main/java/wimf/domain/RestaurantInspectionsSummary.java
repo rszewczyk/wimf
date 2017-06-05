@@ -88,12 +88,7 @@ public final class RestaurantInspectionsSummary {
         ImmutableMap.Builder<String, List<Aggregation<LocalDateTime>>> gradesByDate = ImmutableMap.builder();
 
         Arrays.asList("A", "B", "C").forEach(g ->
-            gradesByDate.put(g, dao.getGradeDateAggregation(
-                    "inspection_date",
-                    Stream.concat(
-                            Stream.of("grade=" + g),
-                            userFilter.stream())
-                        .collect(ImmutableList.toImmutableList())))
+                gradesByDate.put(g, dao.getGradeDateAggregation("inspection_date", userFilter, g))
         );
 
         return gradesByDate.build();
@@ -106,12 +101,7 @@ public final class RestaurantInspectionsSummary {
         ImmutableMap.Builder<String, List<Aggregation<String>>> grades = ImmutableMap.builder();
 
         Arrays.asList("A", "B", "C").forEach(g ->
-                grades.put(g, dao.getGradeStringAggregation(
-                        aggName,
-                        Stream.concat(
-                                Stream.of("grade=" + g),
-                                userFilter.stream())
-                                .collect(ImmutableList.toImmutableList())))
+                grades.put(g, dao.getGradeStringAggregation(aggName, userFilter, g))
         );
 
         return grades.build();

@@ -86,24 +86,30 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
 
     @Override
     protected List<RestaurantInspectionsSummary.Aggregation<String>> getGradeStringAggregation(final String aggName,
-                                                                                               final List<String> filter) {
-        final String wc = RestaurantInspectionUtil.getWhereClause(filter);
+                                                                                               final List<String> userFilter,
+                                                                                               final String grade) {
+        final String wc = RestaurantInspectionUtil.getWhereClause(userFilter);
         return dao.getGradeAggregation(
                 aggName,
-                Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
+                Strings.isNullOrEmpty(wc)
+                        ? "WHERE grade='" + grade + "'"
+                        : "WHERE grade='" + grade + "' AND (" + wc + ")",
                 "count DESC",
-                RestaurantInspectionUtil.getWhereValues(filter));
+                RestaurantInspectionUtil.getWhereValues(userFilter));
     }
 
     @Override
     protected List<RestaurantInspectionsSummary.Aggregation<LocalDateTime>> getGradeDateAggregation(final String aggName,
-                                                                                                    final List<String> filter) {
-        final String wc = RestaurantInspectionUtil.getWhereClause(filter);
+                                                                                                    final List<String> userFilter,
+                                                                                                    final String grade) {
+        final String wc = RestaurantInspectionUtil.getWhereClause(userFilter);
         return dao.getGradeDateAggregation(
                 aggName,
-                Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
+                Strings.isNullOrEmpty(wc)
+                        ? "WHERE grade='" + grade + "'"
+                        : "WHERE grade='" + grade + "' AND (" + wc + ")",
                 "agg ASC",
-                RestaurantInspectionUtil.getWhereValues(filter));
+                RestaurantInspectionUtil.getWhereValues(userFilter));
     }
 
     @Override
