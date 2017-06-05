@@ -22,12 +22,20 @@ public final class RestaurantInspectionsSummaryDTO {
         final ImmutableMap.Builder<String, List<StringAggregationDTO>> cuisineBuilder = ImmutableMap.builder();
         summary.gradesByCuisine.forEach((k, v) -> cuisineBuilder.put(k, StringAggregationDTO.fromModels(v)));
 
+        final ImmutableMap.Builder<String, List<StringAggregationDTO>> inspectionTypeBuilder = ImmutableMap.builder();
+        summary.gradesByInspectionType.forEach((k, v) -> inspectionTypeBuilder.put(k, StringAggregationDTO.fromModels(v)));
+
+        final ImmutableMap.Builder<String, List<StringAggregationDTO>> termsBuilder = ImmutableMap.builder();
+        summary.terms.forEach((k, v) -> termsBuilder.put(k, StringAggregationDTO.fromModels(v)));
+
         return new RestaurantInspectionsSummaryDTO(
                 summary.total,
                 summary.gradeTotal,
                 builder.build(),
                 boroBuilder.build(),
-                cuisineBuilder.build());
+                cuisineBuilder.build(),
+                inspectionTypeBuilder.build(),
+                termsBuilder.build());
     }
 
     @JsonCreator
@@ -36,14 +44,18 @@ public final class RestaurantInspectionsSummaryDTO {
             @JsonProperty("gradeTotal") final long gradeTotal,
             @JsonProperty("gradesByDate") final Map<String, List<TimestampAggregationDTO>> gradesByDate,
             @JsonProperty("gradesByBoro") final Map<String, List<StringAggregationDTO>> gradesByBoro,
-            @JsonProperty("gradesByCuisine") final Map<String, List<StringAggregationDTO>> gradesByCuisine) {
+            @JsonProperty("gradesByCuisine") final Map<String, List<StringAggregationDTO>> gradesByCuisine,
+            @JsonProperty("gradesByInspectionType") final Map<String, List<StringAggregationDTO>> gradesByInspectionType,
+            @JsonProperty("terms") final Map<String, List<StringAggregationDTO>> terms) {
 
         return new RestaurantInspectionsSummaryDTO(
                 total,
                 gradeTotal,
                 ImmutableMap.copyOf(gradesByDate),
                 ImmutableMap.copyOf(gradesByBoro),
-                ImmutableMap.copyOf(gradesByCuisine));
+                ImmutableMap.copyOf(gradesByCuisine),
+                ImmutableMap.copyOf(gradesByInspectionType),
+                ImmutableMap.copyOf(terms));
     }
 
     public final long total;
@@ -51,17 +63,23 @@ public final class RestaurantInspectionsSummaryDTO {
     public final Map<String, List<TimestampAggregationDTO>> gradesByDate;
     public final Map<String, List<StringAggregationDTO>> gradesByBoro;
     public final Map<String, List<StringAggregationDTO>> gradesByCuisine;
+    public final Map<String, List<StringAggregationDTO>> gradesByInspectionType;
+    public final Map<String, List<StringAggregationDTO>> terms;
 
     private RestaurantInspectionsSummaryDTO(final long total,
                                             final long gradeTotal,
                                             final Map<String, List<TimestampAggregationDTO>> gradesByDate,
                                             final Map<String, List<StringAggregationDTO>> gradesByBoro,
-                                            final Map<String, List<StringAggregationDTO>> gradesByCuisine) {
+                                            final Map<String, List<StringAggregationDTO>> gradesByCuisine,
+                                            final Map<String, List<StringAggregationDTO>> gradesByInspectionType,
+                                            final Map<String, List<StringAggregationDTO>> terms) {
         this.total = total;
         this.gradeTotal = gradeTotal;
         this.gradesByDate = gradesByDate;
         this.gradesByBoro = gradesByBoro;
         this.gradesByCuisine = gradesByCuisine;
+        this.gradesByInspectionType = gradesByInspectionType;
+        this.terms = terms;
     }
 
     public static final class TimestampAggregationDTO {

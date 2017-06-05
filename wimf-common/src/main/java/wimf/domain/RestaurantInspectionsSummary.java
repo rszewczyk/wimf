@@ -33,7 +33,9 @@ public final class RestaurantInspectionsSummary {
                 gradeTotal,
                 getGradesByDate(dao, params.filters),
                 getGradesAgg(dao, params.filters, "boro"),
-                getGradesAgg(dao, params.filters, "cuisine"));
+                getGradesAgg(dao, params.filters, "cuisine"),
+                getGradesAgg(dao, params.filters, "inspection_type"),
+                getTerms(dao, params.filters));
     }
 
     public final long total;
@@ -41,17 +43,23 @@ public final class RestaurantInspectionsSummary {
     public final Map<String, List<Aggregation<LocalDateTime>>> gradesByDate;
     public final Map<String, List<Aggregation<String>>> gradesByBoro;
     public final Map<String, List<Aggregation<String>>> gradesByCuisine;
+    public final Map<String, List<Aggregation<String>>> gradesByInspectionType;
+    public final Map<String, List<Aggregation<String>>> terms;
 
     RestaurantInspectionsSummary(final long total,
                                  final long gradeTotal,
                                  final Map<String, List<Aggregation<LocalDateTime>>> gradesByDate,
                                  final Map<String, List<Aggregation<String>>> gradesByBoro,
-                                 final Map<String, List<Aggregation<String>>> gradesByCuisine) {
+                                 final Map<String, List<Aggregation<String>>> gradesByCuisine,
+                                 final Map<String, List<Aggregation<String>>> gradesByInspectionType,
+                                 final Map<String, List<Aggregation<String>>> terms) {
         this.total = total;
         this.gradeTotal = gradeTotal;
         this.gradesByDate = gradesByDate;
         this.gradesByBoro = gradesByBoro;
         this.gradesByCuisine = gradesByCuisine;
+        this.gradesByInspectionType = gradesByInspectionType;
+        this.terms = terms;
     }
 
     public static final class Aggregation<T> {
@@ -62,6 +70,16 @@ public final class RestaurantInspectionsSummary {
             this.value = value;
             this.count = count;
         }
+    }
+
+    private static Map<String, List<Aggregation<String>>> getTerms(final RestaurantInspectionDao dao,
+                                                                   final List<String> userFilter) {
+
+        ImmutableMap.Builder<String, List<Aggregation<String>>> terms = ImmutableMap.builder();
+
+        Arrays.asList("cuisine", "boro", "inspection_type").forEach(t -> terms.put(t, dao.countTerms(t, userFilter)));
+
+        return terms.build();
     }
 
     private static Map<String, List<Aggregation<LocalDateTime>>> getGradesByDate(final RestaurantInspectionDao dao,
