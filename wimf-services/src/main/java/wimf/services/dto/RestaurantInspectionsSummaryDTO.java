@@ -31,6 +31,8 @@ public final class RestaurantInspectionsSummaryDTO {
         return new RestaurantInspectionsSummaryDTO(
                 summary.total,
                 summary.gradeTotal,
+                summary.minDate,
+                summary.maxDate,
                 builder.build(),
                 boroBuilder.build(),
                 cuisineBuilder.build(),
@@ -42,6 +44,8 @@ public final class RestaurantInspectionsSummaryDTO {
     public static RestaurantInspectionsSummaryDTO of(
             @JsonProperty("total") final long total,
             @JsonProperty("gradeTotal") final long gradeTotal,
+            @JsonProperty("minDate") final LocalDateTime minDate,
+            @JsonProperty("maxDate") final LocalDateTime maxDate,
             @JsonProperty("gradesByDate") final Map<String, List<TimestampAggregationDTO>> gradesByDate,
             @JsonProperty("gradesByBoro") final Map<String, List<StringAggregationDTO>> gradesByBoro,
             @JsonProperty("gradesByCuisine") final Map<String, List<StringAggregationDTO>> gradesByCuisine,
@@ -51,6 +55,8 @@ public final class RestaurantInspectionsSummaryDTO {
         return new RestaurantInspectionsSummaryDTO(
                 total,
                 gradeTotal,
+                minDate,
+                maxDate,
                 ImmutableMap.copyOf(gradesByDate),
                 ImmutableMap.copyOf(gradesByBoro),
                 ImmutableMap.copyOf(gradesByCuisine),
@@ -60,6 +66,8 @@ public final class RestaurantInspectionsSummaryDTO {
 
     public final long total;
     public final long gradeTotal;
+    public final LocalDateTime minDate;
+    public final LocalDateTime maxDate;
     public final Map<String, List<TimestampAggregationDTO>> gradesByDate;
     public final Map<String, List<StringAggregationDTO>> gradesByBoro;
     public final Map<String, List<StringAggregationDTO>> gradesByCuisine;
@@ -68,6 +76,8 @@ public final class RestaurantInspectionsSummaryDTO {
 
     private RestaurantInspectionsSummaryDTO(final long total,
                                             final long gradeTotal,
+                                            final LocalDateTime minDate,
+                                            final LocalDateTime maxDate,
                                             final Map<String, List<TimestampAggregationDTO>> gradesByDate,
                                             final Map<String, List<StringAggregationDTO>> gradesByBoro,
                                             final Map<String, List<StringAggregationDTO>> gradesByCuisine,
@@ -75,6 +85,8 @@ public final class RestaurantInspectionsSummaryDTO {
                                             final Map<String, List<StringAggregationDTO>> terms) {
         this.total = total;
         this.gradeTotal = gradeTotal;
+        this.minDate = minDate;
+        this.maxDate = maxDate;
         this.gradesByDate = gradesByDate;
         this.gradesByBoro = gradesByBoro;
         this.gradesByCuisine = gradesByCuisine;

@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from "react";
 import * as time from "d3-time";
+import { Brush } from "recharts";
 import MultiSeriesChart from "./MultiSeriesChart";
 import type { FetcherComponentProps } from "./fetcher";
 
@@ -28,35 +29,17 @@ type Buckets = {
   [string]: Array<Term>
 };
 
-export function dateMonthCounts(buckets: Buckets) {
-  const keys = Object.keys(buckets);
-
-  // find the min and max date in each series - this will give us
-  // the min/max for the combined data. Note that the series are sorted
-  // by date, so we only need to check the first and last elements of each
-  // series
-  const [min, max] = [
-    Math.min(
-      ...keys
-        // filter out keys for empty series
-        .filter(k => buckets[k].length > 0)
-        // map each key to the first element of it series
-        .map(k => new Date(buckets[k][0].value))
-    ),
-    Math.max(
-      ...keys
-        // filter out keys where the array has no elements
-        .filter(k => buckets[k].length > 0)
-        // map each key to the last element element of its series
-        .map(k => new Date(buckets[k].slice(-1)[0].value))
-    )
-  ];
-
-  // create a range of month buckets
+export function dateMonthCounts(
+  buckets: Buckets,
+  minStr: string,
+  maxStr: string
+) {
+  const [min, max] = [new Date(minStr), new Date(maxStr)];
   const r = [time.timeMonth(min), ...time.timeMonths(min, max)];
 
   // initialize each bucket to zero
   const counts = {};
+  const keys = Object.keys(buckets);
   r.forEach(d => {
     counts[d] = keys.reduce((acc, next) => ({ ...acc, [next]: 0 }), {
       value: `${months[d.getMonth()]} ${d.getFullYear()}`
@@ -88,7 +71,7 @@ export function termCounts(buckets: Buckets, terms: Array<Term>) {
   return terms.map(t => counts[t.value]);
 }
 
-export function createRequest(filters: Filters) {
+export function createRequest(filters: Filters): string {
   const queryString = Object.keys(filters)
     .map(filterName =>
       filters[filterName]
@@ -166,6 +149,8 @@ export default class App extends Component {
       gradesByBoro,
       gradesByCuisine,
       gradesByInspectionType,
+      minDate,
+      maxDate,
       terms
     } = this.props.data;
 
@@ -205,7 +190,12 @@ export default class App extends Component {
           <button onClick={this.applyFilters} children="apply" />
           <button onClick={this.clearFilters} children="clear" />
         </div>
-        <MultiSeriesChart type="line" data={dateMonthCounts(gradesByDate)} />
+        <MultiSeriesChart
+          type="line"
+          data={dateMonthCounts(gradesByDate, minDate, maxDate)}
+        >
+          <Brush dataKey="name" height={30} stroke="#8884d8" />
+        </MultiSeriesChart>
         <MultiSeriesChart
           type="bar"
           data={termCounts(gradesByBoro, terms.boro)}

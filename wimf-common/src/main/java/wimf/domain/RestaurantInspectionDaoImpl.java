@@ -57,6 +57,16 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     }
 
     @Override
+    protected LocalDateTime getMinDate() {
+        return dao.getMinDate();
+    }
+
+    @Override
+    protected LocalDateTime getMaxDate() {
+        return dao.getMaxDate();
+    }
+
+    @Override
     protected long count(final List<String> filter) {
         final String wc = RestaurantInspectionUtil.getWhereClause(filter);
 
@@ -190,6 +200,12 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
                                                                                               @Define("where") String where,
                                                                                               @Define("order") String order,
                                                                                               @BindMap Map<String, Object> whereVals);
+
+        @SqlQuery("SELECT max(inspection_date) FROM restaurant_inspection")
+        LocalDateTime getMaxDate();
+
+        @SqlQuery("SELECT min(inspection_date) FROM restaurant_inspection")
+        LocalDateTime getMinDate();
     }
 
     static public class RestaurantInspectionMapper implements RowMapper<RestaurantInspection> {

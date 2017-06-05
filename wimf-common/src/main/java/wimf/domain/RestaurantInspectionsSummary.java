@@ -9,8 +9,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class RestaurantInspectionsSummary {
 
@@ -25,12 +23,11 @@ public final class RestaurantInspectionsSummary {
             throw new ConstraintViolationException(cv);
         }
 
-        final long total = dao.count(params.filters);
-        final long gradeTotal = dao.countGrades(params.filters);
-
         return new RestaurantInspectionsSummary(
-                total,
-                gradeTotal,
+                dao.count(params.filters),
+                dao.countGrades(params.filters),
+                dao.getMinDate(),
+                dao.getMaxDate(),
                 getGradesByDate(dao, params.filters),
                 getGradesAgg(dao, params.filters, "boro"),
                 getGradesAgg(dao, params.filters, "cuisine"),
@@ -40,6 +37,8 @@ public final class RestaurantInspectionsSummary {
 
     public final long total;
     public final long gradeTotal;
+    public final LocalDateTime minDate;
+    public final LocalDateTime maxDate;
     public final Map<String, List<Aggregation<LocalDateTime>>> gradesByDate;
     public final Map<String, List<Aggregation<String>>> gradesByBoro;
     public final Map<String, List<Aggregation<String>>> gradesByCuisine;
@@ -48,6 +47,8 @@ public final class RestaurantInspectionsSummary {
 
     RestaurantInspectionsSummary(final long total,
                                  final long gradeTotal,
+                                 final LocalDateTime minDate,
+                                 final LocalDateTime maxDate,
                                  final Map<String, List<Aggregation<LocalDateTime>>> gradesByDate,
                                  final Map<String, List<Aggregation<String>>> gradesByBoro,
                                  final Map<String, List<Aggregation<String>>> gradesByCuisine,
@@ -55,6 +56,8 @@ public final class RestaurantInspectionsSummary {
                                  final Map<String, List<Aggregation<String>>> terms) {
         this.total = total;
         this.gradeTotal = gradeTotal;
+        this.minDate = minDate;
+        this.maxDate = maxDate;
         this.gradesByDate = gradesByDate;
         this.gradesByBoro = gradesByBoro;
         this.gradesByCuisine = gradesByCuisine;
@@ -88,7 +91,14 @@ public final class RestaurantInspectionsSummary {
         ImmutableMap.Builder<String, List<Aggregation<LocalDateTime>>> gradesByDate = ImmutableMap.builder();
 
         Arrays.asList("A", "B", "C").forEach(g ->
-                gradesByDate.put(g, dao.getGradeDateAggregation("inspection_date", userFilter, g))
+                gradesByDate.put(
+                        g,
+                        dao.getGradeDateAggregation(
+                                "inspection_date",
+                                userFilter.stream()
+                                        .filter(f -> !f.startsWith("inspection_date"))
+                                        .collect(ImmutableList.toImmutableList()),
+                                g))
         );
 
         return gradesByDate.build();

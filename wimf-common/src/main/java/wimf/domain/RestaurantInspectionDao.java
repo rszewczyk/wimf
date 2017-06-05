@@ -34,4 +34,7 @@ public abstract class RestaurantInspectionDao implements AutoCloseable {
 
     abstract protected List<RestaurantInspectionsSummary.Aggregation<String>> countTerms(final String field, final List<String> filter);
 
+    abstract protected LocalDateTime getMinDate();
+
+    abstract protected LocalDateTime getMaxDate();
 }

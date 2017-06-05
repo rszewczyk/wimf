@@ -12,18 +12,27 @@ import {
   Legend
 } from "recharts";
 
-const colors = ["#8884d8", "#82ca9d", "#ffc658"];
+const colors = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#83a6ed",
+  "#8dd1e1",
+  "#a4de6c",
+  "#d0ed57"
+];
 
 type ComboChartProps = {
   data: Array<Object>,
-  type: "line" | "bar" | "barStacked"
+  type: "line" | "bar" | "barStacked",
+  children?: any
 };
 
 export default class ComboChart extends Component {
   props: ComboChartProps;
 
   render() {
-    const { data, type } = this.props;
+    const { data, type, children } = this.props;
     const { value, ...dataKeys } = data[0];
 
     const ChartComp = type === "line" ? LineChart : BarChart;
@@ -46,6 +55,7 @@ export default class ComboChart extends Component {
                 fill={colors[i]}
               />
             )}
+        {children}
       </ChartComp>
     );
   }
