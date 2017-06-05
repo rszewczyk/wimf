@@ -57,18 +57,20 @@ export function dateMonthCounts(
   return r.map(d => counts[d]);
 }
 
-export function termCounts(buckets: Buckets, terms: Array<Term>) {
+export function termCounts(buckets: Buckets, terms: Array<string>) {
   const keys = Object.keys(buckets);
   const counts = {};
   terms.forEach(t => {
-    counts[t.value] = keys.reduce((acc, next) => ({ ...acc, [next]: 0 }), {
-      value: t.value
+    counts[t] = keys.reduce((acc, next) => ({ ...acc, [next]: 0 }), {
+      value: t
     });
   });
 
   keys.forEach(k => buckets[k].forEach(v => (counts[v.value][k] += v.count)));
 
-  return terms.map(t => counts[t.value]);
+  return terms
+    .map(t => counts[t])
+    .filter(({ value, ...agg }) => Object.keys(agg).some(k => agg[k] > 0));
 }
 
 export function createRequest(filters: Filters): string {
@@ -134,14 +136,12 @@ export default class App extends Component {
   };
 
   render() {
-    if (this.props.loading) {
-      return <div children="loading!" />;
+    const { data, error, loading } = this.props;
+    if (!data) {
+      return loading ? <div>loading</div> : <div>no data!</div>;
     }
     if (this.props.error) {
       return <div children={this.props.error.message} />;
-    }
-    if (!this.props.data) {
-      return <div children="no data!" />;
     }
 
     const {
@@ -154,37 +154,39 @@ export default class App extends Component {
       terms
     } = this.props.data;
 
+    const { filters } = this.state;
+
     return (
       <div>
         <div>
           <label>Boro</label>
           <select
-            value={this.state.filters.boro}
+            value={filters.boro}
             multiple
             onChange={this.filterChange.bind(null, "boro")}
           >
-            {terms.boro.map((b, i) =>
-              <option key={i} value={b.value} children={b.value} />
+            {terms.boro.map((t, i) =>
+              <option key={i} value={t} children={t} />
             )}
           </select>
           <label>Cuisine</label>
           <select
-            value={this.state.filters.cuisine}
+            value={filters.cuisine}
             multiple
             onChange={this.filterChange.bind(null, "cuisine")}
           >
-            {terms.cuisine.map((b, i) =>
-              <option key={i} value={b.value} children={b.value} />
+            {terms.cuisine.map((t, i) =>
+              <option key={i} value={t} children={t} />
             )}
           </select>
           <label>Inspection Type</label>
           <select
-            value={this.state.filters.inspection_type}
+            value={filters.inspection_type}
             multiple
             onChange={this.filterChange.bind(null, "inspection_type")}
           >
-            {terms.inspection_type.map((b, i) =>
-              <option key={i} value={b.value} children={b.value} />
+            {terms.inspection_type.map((t, i) =>
+              <option key={i} value={t} children={t} />
             )}
           </select>
           <button onClick={this.applyFilters} children="apply" />

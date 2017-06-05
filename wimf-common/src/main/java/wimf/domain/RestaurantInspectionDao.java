@@ -32,7 +32,7 @@ public abstract class RestaurantInspectionDao implements AutoCloseable {
 
     abstract protected long countGrades(final List<String> filter);
 
-    abstract protected List<RestaurantInspectionsSummary.Aggregation<String>> countTerms(final String field, final List<String> filter);
+    abstract protected List<String> groupTerms(final String field);
 
     abstract protected LocalDateTime getMinDate();
 

@@ -85,13 +85,8 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     }
 
     @Override
-    protected List<RestaurantInspectionsSummary.Aggregation<String>> countTerms(final String field, final List<String> filter) {
-        final String wc = RestaurantInspectionUtil.getWhereClause(filter);
-
-        return dao.countTerms(
-                field,
-                Strings.isNullOrEmpty(wc) ? "" : "WHERE " + wc,
-                RestaurantInspectionUtil.getWhereValues(filter));
+    protected List<String> groupTerms(final String field) {
+        return dao.groupTerms(field);
     }
 
     @Override
@@ -181,11 +176,8 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
                   ") sub")
         long countGrades(@Define("where") String where, @BindMap Map<String, Object> whereVals);
 
-        @RegisterRowMapper(StringAggregationMapper.class)
-        @SqlQuery("SELECT <select> agg, count(*) count FROM restaurant_inspection <where> GROUP BY agg")
-        List<RestaurantInspectionsSummary.Aggregation<String>> countTerms(@Define("select") String aggName,
-                                                                          @Define("where") String where,
-                                                                          @BindMap Map<String, Object> whereVals);
+        @SqlQuery("SELECT <select> agg FROM restaurant_inspection GROUP BY agg")
+        List<String> groupTerms(@Define("select") String aggName);
 
         @RegisterRowMapper(StringAggregationMapper.class)
         @SqlQuery(GRADE_AGG_QUERY)

@@ -32,7 +32,7 @@ public final class RestaurantInspectionsSummary {
                 getGradesAgg(dao, params.filters, "boro"),
                 getGradesAgg(dao, params.filters, "cuisine"),
                 getGradesAgg(dao, params.filters, "inspection_type"),
-                getTerms(dao, params.filters));
+                getTerms(dao));
     }
 
     public final long total;
@@ -43,7 +43,7 @@ public final class RestaurantInspectionsSummary {
     public final Map<String, List<Aggregation<String>>> gradesByBoro;
     public final Map<String, List<Aggregation<String>>> gradesByCuisine;
     public final Map<String, List<Aggregation<String>>> gradesByInspectionType;
-    public final Map<String, List<Aggregation<String>>> terms;
+    public final Map<String, List<String>> terms;
 
     RestaurantInspectionsSummary(final long total,
                                  final long gradeTotal,
@@ -53,7 +53,7 @@ public final class RestaurantInspectionsSummary {
                                  final Map<String, List<Aggregation<String>>> gradesByBoro,
                                  final Map<String, List<Aggregation<String>>> gradesByCuisine,
                                  final Map<String, List<Aggregation<String>>> gradesByInspectionType,
-                                 final Map<String, List<Aggregation<String>>> terms) {
+                                 final Map<String, List<String>> terms) {
         this.total = total;
         this.gradeTotal = gradeTotal;
         this.minDate = minDate;
@@ -75,12 +75,11 @@ public final class RestaurantInspectionsSummary {
         }
     }
 
-    private static Map<String, List<Aggregation<String>>> getTerms(final RestaurantInspectionDao dao,
-                                                                   final List<String> userFilter) {
+    private static Map<String, List<String>> getTerms(final RestaurantInspectionDao dao) {
 
-        ImmutableMap.Builder<String, List<Aggregation<String>>> terms = ImmutableMap.builder();
+        ImmutableMap.Builder<String, List<String>> terms = ImmutableMap.builder();
 
-        Arrays.asList("cuisine", "boro", "inspection_type").forEach(t -> terms.put(t, dao.countTerms(t, userFilter)));
+        Arrays.asList("cuisine", "boro", "inspection_type").forEach(t -> terms.put(t, dao.groupTerms(t)));
 
         return terms.build();
     }
