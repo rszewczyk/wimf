@@ -11,6 +11,8 @@ import java.util.List;
 public abstract class RestaurantInspectionDao implements AutoCloseable {
     abstract protected void insert(RestaurantInspection inspection);
 
+    abstract protected void insert(final List<RestaurantInspection> inspections);
+
     abstract protected List<RestaurantInspection> fetchPage(final int limit,
                                                             final int offset,
                                                             final List<String> sort);

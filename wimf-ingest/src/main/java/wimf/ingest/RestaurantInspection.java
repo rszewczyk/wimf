@@ -13,6 +13,21 @@ import java.util.Date;
  */
 final public class RestaurantInspection {
 
+    public static wimf.domain.RestaurantInspection asModel(final RestaurantInspection ri) {
+        return new wimf.domain.RestaurantInspection(
+                ri.businessName,
+                ri.boro,
+                ri.grade,
+                ri.inspectionDate,
+                ri.businessID,
+                ri.cuisine,
+                ri.violationCode,
+                ri.violationDescription,
+                ri.score,
+                ri.inspectionType
+        );
+    }
+
     @JsonCreator
     public static RestaurantInspection of(
             @JsonProperty("camis") final String businessID,

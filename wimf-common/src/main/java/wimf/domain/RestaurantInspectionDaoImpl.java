@@ -10,6 +10,7 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindMap;
 import org.jdbi.v3.sqlobject.customizer.Define;
+import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -31,6 +32,11 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     @Override
     protected void insert(final RestaurantInspection inspection) {
         dao.insert(inspection);
+    }
+
+    @Override
+    protected void insert(final List<RestaurantInspection> inspections) {
+        dao.insert(inspections);
     }
 
     @Override
@@ -132,23 +138,28 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
             ") sub " +
             "GROUP BY agg ORDER BY <order>";
 
+    private static final String INSERT_QUERY =
+            "INSERT INTO restaurant_inspection (" +
+                    "business_name, " +
+                    "boro, " +
+                    "grade, " +
+                    "inspection_date, " +
+                    "business_id, " +
+                    "cuisine, " +
+                    "violation_code, " +
+                    "violation_description, " +
+                    "score, " +
+                    "inspection_type) " +
+            "VALUES (:businessName, :boro, :grade, :inspectionDate, " +
+                    ":businessID, :cuisine, :violationCode, :violationDescription, " +
+                    ":score, :inspectionType)";
+
     public interface RestaurantInspectionJdbiDao extends SqlObject {
-        @SqlUpdate(
-                "INSERT INTO restaurant_inspection (" +
-                        "business_name, " +
-                        "boro, " +
-                        "grade, " +
-                        "inspection_date, " +
-                        "business_id, " +
-                        "cuisine, " +
-                        "violation_code, " +
-                        "violation_description, " +
-                        "score, " +
-                        "inspection_type) " +
-                "VALUES (:businessName, :boro, :grade, :inspectionDate, " +
-                        ":businessID, :cuisine, :violationCode, :violationDescription, " +
-                        ":score, :inspectionType)")
+        @SqlUpdate(INSERT_QUERY)
         void insert(@BindBean RestaurantInspection inspection);
+
+        @SqlBatch(INSERT_QUERY)
+        void insert(@BindBean List<RestaurantInspection> inspection);
 
         @RegisterRowMapper(RestaurantInspectionMapper.class)
         @SqlQuery("SELECT * from restaurant_inspection ORDER BY <order> LIMIT :limit OFFSET :offset")

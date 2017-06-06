@@ -71,14 +71,22 @@ public class RestaurantInspection {
         this.inspectionType = inspectionType;
     }
 
-    public static void save(final RestaurantInspectionDao dao, final RestaurantInspection inspection) {
-        final Set<ConstraintViolation<RestaurantInspection>> cv = validator.validate(inspection);
+    private void validate() {
+        final Set<ConstraintViolation<RestaurantInspection>> cv = validator.validate(this);
 
         if (cv.size() > 0) {
             throw new ConstraintViolationException(cv);
         }
+    }
 
+    public static void save(final RestaurantInspectionDao dao, final RestaurantInspection inspection) {
+        inspection.validate();
         dao.insert(inspection);
+    }
+
+    public static void save(final RestaurantInspectionDao dao, final List<RestaurantInspection> inspections) {
+        inspections.forEach(RestaurantInspection::validate);
+        dao.insert(inspections);
     }
 
     public static List<RestaurantInspection> query(final RestaurantInspectionDao dao,

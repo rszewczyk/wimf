@@ -12,6 +12,10 @@ import wimf.domain.Database;
 import wimf.domain.PostgresDatabase;
 import wimf.domain.RestaurantInspectionDao;
 
+import java.util.stream.Collectors;
+
+import static wimf.domain.RestaurantInspection.save;
+
 public class App {
 
     private static final Logger log = LoggerFactory.getLogger(App.class);
@@ -106,22 +110,8 @@ public class App {
                     ? new RestaurantInspectionConsumer(pageSize).getAll()
                     : new RestaurantInspectionConsumer(pageSize).getAll().take(maxInspections);
 
-            inspections.forEach(ri ->
-                    wimf.domain.RestaurantInspection.save(
-                            dao,
-                            new wimf.domain.RestaurantInspection(
-                                    ri.businessName,
-                                    ri.boro,
-                                    ri.grade,
-                                    ri.inspectionDate,
-                                    ri.businessID,
-                                    ri.cuisine,
-                                    ri.violationCode,
-                                    ri.violationDescription,
-                                    ri.score,
-                                    ri.inspectionType
-                            )
-                    ));
+            inspections.buffer(1000).forEach(rib ->
+                    save(dao, rib.stream().map(RestaurantInspection::asModel).collect(Collectors.toList())));
 
             // TODO: error handling for a failed inspection
         }

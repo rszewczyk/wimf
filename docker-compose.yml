@@ -6,9 +6,6 @@ services:
       - '5432'
   ingest:
     image: wimf/ingest
-    command:
-      - --max-inspections
-      - '100000'
     depends_on:
       - postgres
   services:
