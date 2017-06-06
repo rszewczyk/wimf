@@ -187,8 +187,12 @@ export default class App extends Component {
   };
 
   clearFilters = () => {
+    const { dateRange } = this.state;
+
     const cleared = {
       ...this.state,
+      startDateIndex: 0,
+      endDateIndex: dateRange.length - 1,
       filters: {
         inspection_type: [],
         cuisine: [],
@@ -196,6 +200,7 @@ export default class App extends Component {
       },
       resetDates: true
     };
+
     this.setState(cleared);
     this.props.fetch(createRequest(cleared));
   };
