@@ -1,9 +1,16 @@
 // @flow
 import React, { Component } from "react";
 import { List } from "react-virtualized";
+import { css } from "glamor";
 import type { FetcherComponentProps } from "./fetcher";
 import wrapWithFetcher from "./fetcher";
 import Pane from "./Pane";
+
+const linkStyle = css({
+  textDecoration: "underline",
+  color: "blue",
+  cursor: "pointer"
+});
 
 type FetchingListProps = FetcherComponentProps & {
   reset?: boolean,
@@ -44,7 +51,9 @@ export class FetchingList extends Component {
 
     let content;
     if (index === list.length) {
-      content = <a onClick={this.loadMore} children="load more" />;
+      content = (
+        <a {...linkStyle} onClick={this.loadMore} children="load more" />
+      );
     } else {
       content = <Row {...list[index]} />;
     }
