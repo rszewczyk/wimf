@@ -28,7 +28,7 @@ final class RestaurantInspectionUtil {
             return "inspection_date DESC";
         }
 
-        return String.join(" ", sort);
+        return String.join(", ", sort);
     }
 
     /**
