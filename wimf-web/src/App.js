@@ -2,6 +2,7 @@
 import React, { Component } from "react";
 import * as time from "d3-time";
 import { Brush } from "recharts";
+import debounce from "lodash/debounce";
 import MultiSeriesChart from "./MultiSeriesChart";
 import type { FetcherComponentProps } from "./fetcher";
 
@@ -29,19 +30,12 @@ type Buckets = {
   [string]: Array<Term>
 };
 
-export function dateMonthCounts(
-  buckets: Buckets,
-  minStr: string,
-  maxStr: string
-) {
-  const [min, max] = [new Date(minStr), new Date(maxStr)];
-  const r = [time.timeMonth(min), ...time.timeMonths(min, max)];
-
+export function dateMonthCounts(buckets: Buckets, range: Array<Date>) {
   // initialize each bucket to zero
   const counts = {};
   const keys = Object.keys(buckets);
-  r.forEach(d => {
-    counts[d] = keys.reduce((acc, next) => ({ ...acc, [next]: 0 }), {
+  range.forEach(d => {
+    counts[d.toString()] = keys.reduce((acc, next) => ({ ...acc, [next]: 0 }), {
       value: `${months[d.getMonth()]} ${d.getFullYear()}`
     });
   });
@@ -54,7 +48,7 @@ export function dateMonthCounts(
     })
   );
 
-  return r.map(d => counts[d]);
+  return range.map(d => counts[d.toString()]);
 }
 
 export function termCounts(buckets: Buckets, terms: Array<string>) {
@@ -73,19 +67,6 @@ export function termCounts(buckets: Buckets, terms: Array<string>) {
     .filter(({ value, ...agg }) => Object.keys(agg).some(k => agg[k] > 0));
 }
 
-export function createRequest(filters: Filters): string {
-  const queryString = Object.keys(filters)
-    .map(filterName =>
-      filters[filterName]
-        .map(val => `filter=${encodeURIComponent(`${filterName}=${val}`)}`)
-        .join("&")
-    )
-    .filter(f => !!f)
-    .join("&");
-
-  return "/api/summary?" + queryString;
-}
-
 type Filters = {
   inspection_type: Array<string>,
   cuisine: Array<string>,
@@ -93,8 +74,52 @@ type Filters = {
 };
 
 type AppState = {
-  filters: Filters
+  filters: Filters,
+  dateRange: Array<Date>,
+  startDateIndex: number,
+  endDateIndex: number
 };
+
+function twoDigit(n: number): string {
+  return n < 10 ? `0${n}` : `${n}`;
+}
+
+function makeTimeStamp(d: Date) {
+  return `${d.getFullYear()}-${twoDigit(d.getMonth() + 1)}-${twoDigit(
+    d.getDate()
+  )}T00:00:00`;
+}
+
+function makeFilter(name: string, val: string, op: string = "="): string {
+  return `filter=${encodeURIComponent(`${name}${op}${val}`)}`;
+}
+
+export function createRequest(state: AppState): string {
+  const { filters, startDateIndex, endDateIndex, dateRange } = state;
+
+  let queryString = Object.keys(filters)
+    .map(n => filters[n].map(val => makeFilter(n, val)).join("&"))
+    .filter(f => f.length > 0)
+    .join("&");
+
+  if (startDateIndex > -1) {
+    queryString = `${queryString}&${makeFilter(
+      "inspection_date",
+      makeTimeStamp(dateRange[startDateIndex]),
+      ">"
+    )}`;
+  }
+
+  if (endDateIndex > -1) {
+    queryString = `${queryString}&${makeFilter(
+      "inspection_date",
+      makeTimeStamp(dateRange[endDateIndex]),
+      "<"
+    )}`;
+  }
+
+  return "/api/summary?" + queryString;
+}
 
 export default class App extends Component {
   props: FetcherComponentProps;
@@ -103,8 +128,31 @@ export default class App extends Component {
       inspection_type: [],
       cuisine: [],
       boro: []
-    }
+    },
+    dateRange: [],
+    startDateIndex: -1,
+    endDateIndex: -1
   };
+
+  dateRangeChange = debounce(
+    ({ startIndex, endIndex }) => {
+      const indexState = {
+        startDateIndex: startIndex,
+        endDateIndex: endIndex
+      };
+      this.setState(indexState);
+      this.props.fetch(
+        createRequest({
+          ...this.state,
+          ...indexState
+        })
+      );
+    },
+    750,
+    {
+      trailing: true
+    }
+  );
 
   filterChange = (filter: string, e: any) => {
     this.setState({
@@ -124,24 +172,41 @@ export default class App extends Component {
         inspection_type: [],
         cuisine: [],
         boro: []
-      }
+      },
+      dateRange: [],
+      startDateIndex: -1,
+      endDateIndex: -1
     };
     this.setState(cleared);
-    this.props.fetch(createRequest(cleared.filters));
+    this.props.fetch(createRequest(cleared));
   };
 
   applyFilters = (e: Event) => {
     e.preventDefault();
-    this.props.fetch(createRequest(this.state.filters));
+    this.props.fetch(createRequest(this.state));
   };
+
+  componentWillReceiveProps(nextProps: FetcherComponentProps) {
+    const { data } = nextProps;
+
+    if (data && !this.props.data) {
+      const [min, max] = [new Date(data.minDate), new Date(data.maxDate)];
+      const dateRange = [time.timeMonth(min), ...time.timeMonths(min, max)];
+      this.setState({
+        dateRange,
+        startDateIndex: 0,
+        endDateIndex: dateRange.length - 1
+      });
+    }
+  }
 
   render() {
     const { data, error, loading } = this.props;
     if (!data) {
       return loading ? <div>loading</div> : <div>no data!</div>;
     }
-    if (this.props.error) {
-      return <div children={this.props.error.message} />;
+    if (error) {
+      return <div children={error.message} />;
     }
 
     const {
@@ -149,12 +214,10 @@ export default class App extends Component {
       gradesByBoro,
       gradesByCuisine,
       gradesByInspectionType,
-      minDate,
-      maxDate,
       terms
-    } = this.props.data;
+    } = data;
 
-    const { filters } = this.state;
+    const { filters, dateRange, startDateIndex, endDateIndex } = this.state;
 
     return (
       <div>
@@ -194,9 +257,16 @@ export default class App extends Component {
         </div>
         <MultiSeriesChart
           type="line"
-          data={dateMonthCounts(gradesByDate, minDate, maxDate)}
+          data={dateMonthCounts(gradesByDate, dateRange)}
         >
-          <Brush dataKey="name" height={30} stroke="#8884d8" />
+          <Brush
+            dataKey="name"
+            height={30}
+            stroke="#8884d8"
+            onChange={this.dateRangeChange}
+            startIndex={startDateIndex}
+            endIndex={endDateIndex}
+          />
         </MultiSeriesChart>
         <MultiSeriesChart
           type="bar"
