@@ -269,6 +269,8 @@ export default class App extends Component {
         <Column width={6}>
           <Overflow>
             <MultiSeriesChart
+              title="Monthly Grade Totals"
+              description="All grades assigned per month. Drag the brush to adjust the date range for all other series."
               type="line"
               data={dateMonthCounts(gradesByDate, dateRange)}
             >
@@ -282,14 +284,18 @@ export default class App extends Component {
               />
             </MultiSeriesChart>
             <MultiSeriesChart
+              title="Grades by Boro"
+              description="Grades broken down by the boro in which the establishment is located."
               type="bar"
               data={termCounts(gradesByBoro, terms.boro)}
             />
             <MultiSeriesChart
+              title="Grades by Cuisine"
               type="barStacked"
               data={termCounts(gradesByCuisine, terms.cuisine)}
             />
             <MultiSeriesChart
+              title="Grades by Inspection Type"
               type="bar"
               data={termCounts(gradesByInspectionType, terms.inspection_type)}
             />
