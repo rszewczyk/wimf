@@ -64,7 +64,10 @@ export function dateMonthCounts(buckets: Buckets, range: Array<Date>) {
   // add its count to the bucket count
   keys.forEach(k =>
     buckets[k].forEach(b => {
-      counts[time.timeMonth(new Date(b.value))][k] += b.count;
+      const month = time.timeMonth(new Date(b.value));
+      if (counts[month]) {
+        counts[month][k] += b.count;
+      }
     })
   );
 
@@ -340,6 +343,7 @@ export class App extends Component {
             />
             <MultiSeriesChart
               title="Grades by Cuisine"
+              description="Grade broken down by the type of food served by the establishment"
               type="barStacked"
               data={termCounts(gradesByCuisine, terms.cuisine)}
             />
