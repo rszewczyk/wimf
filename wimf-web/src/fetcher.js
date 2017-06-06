@@ -40,10 +40,12 @@ export default function wrapWithFetcher(
     return { data, headers: response.headers };
   }
 
+  // TODO: figure out how to type check this
   return (
-    Wrapped:
-      | Class<React$Component<void, FetcherComponentProps, any>>
-      | ((props: FetcherComponentProps) => ?React$Element<any>)
+    Wrapped: any
+    // Wrapped:
+    //   | Class<React$Component<void, FetcherComponentProps, any>>
+    //   | ((props: FetcherComponentProps) => ?React$Element<any>)
   ) => {
     class Fetcher extends Component {
       state: FetchState = {
@@ -65,6 +67,8 @@ export default function wrapWithFetcher(
             headers: res.headers,
             fetchedAt: Date.now()
           });
+
+          return res.data;
         } catch (e) {
           this.setState({ error: { message: e.message } });
         } finally {
@@ -79,11 +83,13 @@ export default function wrapWithFetcher(
       }
 
       render() {
+        const { initialRequest, baseRef, ...props } = this.props;
         return (
           <Wrapped
             {...this.state}
-            ref={this.props.baseRef}
+            ref={baseRef}
             fetch={this.fetch}
+            {...props}
           />
         );
       }

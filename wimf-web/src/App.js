@@ -9,9 +9,12 @@ import Loader from "./Loader";
 import Filter from "./Filter";
 import Page from "./Page";
 import Column from "./Column";
-import Overflow from "./Overflow";
 import Button from "./Button";
 import ButtonBar from "./ButtonBar";
+import List from "./List";
+import Pane from "./Pane";
+import Inspection from "./Inspection";
+import wrapWithFetcher from "./fetcher";
 
 const months = [
   "Jan",
@@ -95,7 +98,8 @@ type AppState = {
   dateRange: Array<Date>,
   startDateIndex: number,
   endDateIndex: number,
-  resetDates: boolean
+  resetDateRange: boolean,
+  resetInspections: boolean
 };
 
 function twoDigit(n: number): string {
@@ -112,7 +116,7 @@ function makeFilter(name: string, val: string, op: string = "="): string {
   return `filter=${encodeURIComponent(`${name}${op}${val}`)}`;
 }
 
-export function createRequest(state: AppState): string {
+export function makeFilters(state: AppState): string {
   const { filters, startDateIndex, endDateIndex, dateRange } = state;
 
   let queryString = Object.keys(filters)
@@ -136,10 +140,24 @@ export function createRequest(state: AppState): string {
     )}`;
   }
 
-  return "/api/summary?" + queryString;
+  return queryString;
 }
 
-export default class App extends Component {
+export function createSummaryRequest(state: AppState): string {
+  return "/api/summary?" + makeFilters(state);
+}
+
+export function createInspectionsRequest(
+  offset: number,
+  state: AppState
+): string {
+  const filters = makeFilters(state);
+  return `/api/inspection?offset=${offset}&limit=250&sort=inspection_date DESC&sort=business_id ASC${filters
+    ? "&" + filters
+    : ""}`;
+}
+
+export class App extends Component {
   props: FetcherComponentProps;
 
   state: AppState = {
@@ -151,7 +169,8 @@ export default class App extends Component {
     dateRange: [],
     startDateIndex: 0,
     endDateIndex: 0,
-    resetDates: true
+    resetDateRange: true,
+    resetInspections: false
   };
 
   dateRangeChange = debounce(
@@ -162,7 +181,7 @@ export default class App extends Component {
       };
       this.setState(indexState);
       this.props.fetch(
-        createRequest({
+        createSummaryRequest({
           ...this.state,
           ...indexState
         })
@@ -198,21 +217,37 @@ export default class App extends Component {
         cuisine: [],
         boro: []
       },
-      resetDates: true
+      resetDateRange: true,
+      resetInspections: true
     };
 
-    this.setState(cleared);
-    this.props.fetch(createRequest(cleared));
+    this.setState(cleared, () =>
+      this.props.fetch(createSummaryRequest(cleared)).then(() => {
+        this.setState({
+          resetInspections: false
+        });
+      })
+    );
   };
 
   applyFilters = () => {
-    this.props.fetch(createRequest(this.state));
+    this.setState(
+      {
+        resetInspections: true
+      },
+      () =>
+        this.props.fetch(createSummaryRequest(this.state)).then(() => {
+          this.setState({
+            resetInspections: false
+          });
+        })
+    );
   };
 
   componentWillReceiveProps(nextProps: FetcherComponentProps) {
     const { data } = nextProps;
 
-    if (data && this.state.resetDates) {
+    if (data && this.state.resetDateRange) {
       const [min, max] = [new Date(data.minDate), new Date(data.maxDate)];
       const dateRange = [time.timeMonth(min), ...time.timeMonths(min, max)];
 
@@ -220,7 +255,7 @@ export default class App extends Component {
         dateRange,
         startDateIndex: 0,
         endDateIndex: dateRange.length - 1,
-        resetDates: false
+        resetDateRange: false
       });
     }
   }
@@ -239,40 +274,49 @@ export default class App extends Component {
       gradesByBoro,
       gradesByCuisine,
       gradesByInspectionType,
-      terms
+      terms,
+      total
     } = data;
 
-    const { filters, dateRange, startDateIndex, endDateIndex } = this.state;
+    const {
+      filters,
+      dateRange,
+      startDateIndex,
+      endDateIndex,
+      resetInspections
+    } = this.state;
 
     return (
       <Page>
         <Column width={2}>
-          <h3 style={{ marginLeft: "0.5rem" }}>Filters:</h3>
-          <Filter
-            name="Boro"
-            value={filters.boro}
-            onChange={this.filterChange.bind(null, "boro")}
-            options={terms.boro}
-          />
-          <Filter
-            name="Cuisine"
-            value={filters.cuisine}
-            onChange={this.filterChange.bind(null, "cuisine")}
-            options={terms.cuisine}
-          />
-          <Filter
-            name="Inspection Type"
-            value={filters.inspection_type}
-            onChange={this.filterChange.bind(null, "inspection_type")}
-            options={terms.inspection_type}
-          />
-          <ButtonBar>
-            <Button primary onClick={this.applyFilters} children="Apply" />
-            <Button onClick={this.clearFilters} children="Clear" />
-          </ButtonBar>
+          <Pane>
+            <h3 style={{ marginLeft: "0.5rem" }}>Filters:</h3>
+            <Filter
+              name="Boro"
+              value={filters.boro}
+              onChange={this.filterChange.bind(null, "boro")}
+              options={terms.boro}
+            />
+            <Filter
+              name="Cuisine"
+              value={filters.cuisine}
+              onChange={this.filterChange.bind(null, "cuisine")}
+              options={terms.cuisine}
+            />
+            <Filter
+              name="Inspection Type"
+              value={filters.inspection_type}
+              onChange={this.filterChange.bind(null, "inspection_type")}
+              options={terms.inspection_type}
+            />
+            <ButtonBar>
+              <Button primary onClick={this.applyFilters} children="Apply" />
+              <Button onClick={this.clearFilters} children="Clear" />
+            </ButtonBar>
+          </Pane>
         </Column>
         <Column width={6}>
-          <Overflow>
+          <Pane>
             <MultiSeriesChart
               title="Monthly Grade Totals"
               description="All grades assigned per month. Drag the brush to adjust the date range for all other series."
@@ -304,10 +348,23 @@ export default class App extends Component {
               type="bar"
               data={termCounts(gradesByInspectionType, terms.inspection_type)}
             />
-          </Overflow>
+            <List
+              title="Inspection Results"
+              description="Individual violations encountered during an inspection"
+              total={total}
+              filters={this.state}
+              initialRequest={createInspectionsRequest(0, this.state)}
+              rowComp={Inspection}
+              reset={resetInspections}
+              createRequest={(offset: number) =>
+                createInspectionsRequest(offset, this.state)}
+            />
+          </Pane>
         </Column>
         <Loader visible={loading} />
       </Page>
     );
   }
 }
+
+export default wrapWithFetcher()(App);

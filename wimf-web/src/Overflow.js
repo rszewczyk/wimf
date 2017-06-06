@@ -8,7 +8,8 @@ type OverflowProps = {
 
 const overflowStyle = css({
   overflowY: "scroll",
-  width: "100%"
+  width: "100%",
+  paddingBottom: "2rem"
 });
 
 export default function Overflow(props: OverflowProps) {

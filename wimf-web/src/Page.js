@@ -8,8 +8,7 @@ type PageProps = {
 
 const pageStyle = css({
   display: "flex",
-  maxHeight: "100vh",
-  overflow: "hidden"
+  paddingBottom: "2rem"
 });
 
 export default function Page(props: PageProps) {
