@@ -37,6 +37,8 @@ public class RestaurantInspection {
     @NotEmptyString
     public final String violationCode;
 
+    public final String violationDescription;
+
     public final String inspectionType;
 
     public final int score;
@@ -48,6 +50,7 @@ public class RestaurantInspection {
                                 final String businessID,
                                 final String cuisine,
                                 final String violationCode,
+                                final String violationDescription,
                                 final int score,
                                 final String inspectionType) {
 
@@ -63,6 +66,7 @@ public class RestaurantInspection {
         this.businessID = businessID;
         this.cuisine = cuisine;
         this.violationCode = violationCode;
+        this.violationDescription = violationDescription;
         this.score = score;
         this.inspectionType = inspectionType;
     }
@@ -120,6 +124,8 @@ public class RestaurantInspection {
     public String getInspectionType() {
         return inspectionType;
     }
+
+    public String getViolationDescription() { return violationDescription; }
 
     public int getScore() {
         return score;

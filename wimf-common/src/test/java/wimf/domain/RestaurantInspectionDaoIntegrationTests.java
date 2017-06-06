@@ -86,6 +86,7 @@ public class RestaurantInspectionDaoIntegrationTests {
                             "b1",
                             "Donuts",
                             "1A",
+                            "some really bad stuff",
                             10,
                             "inspection type 1"
                     ),
@@ -97,6 +98,7 @@ public class RestaurantInspectionDaoIntegrationTests {
                             "b2",
                             "Pizza",
                             "1C",
+                            "some really bad stuff",
                             14,
                             "inspection type 1"
                     )

@@ -6,15 +6,16 @@ import com.beust.jcommander.ParameterException;
 import io.reactivex.Observable;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import wimf.domain.Database;
 import wimf.domain.PostgresDatabase;
 import wimf.domain.RestaurantInspectionDao;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-
 public class App {
+
+    private static final Logger log = LoggerFactory.getLogger(App.class);
+
     @Parameter(names = "--max-inspections", description = "The maximum number of inspections to ingest")
     protected int maxInspections = -1;
 
@@ -36,7 +37,7 @@ public class App {
     @Parameter(names = "--help", description = "Display usage then exit", help = true)
     private boolean help = false;
 
-    public static void main(String[] argv) throws InterruptedException {
+    public static void main(String[] argv) throws Exception {
         final App app = new App();
 
         final JCommander jc = JCommander.newBuilder()
@@ -58,7 +59,7 @@ public class App {
         app.run();
     }
 
-    private void run() throws InterruptedException {
+    private void run() throws Exception {
         final String connection = "jdbc:postgresql://" + dbHost + "/" + dbName + "?user=" + dbUser;
 
          // hacky stand in for real service discovery - make sure we can connect within a reasonable amount of time
@@ -71,7 +72,7 @@ public class App {
                 retry = 0;
             } catch (final Throwable e) {
                 if (retry == 1) {
-                    System.out.printf("Failed to connect to database: %s\n", e.getMessage());
+                    log.error("Failed to connect to database: {}", e.getMessage());
                     System.exit(1);
                 }
 
@@ -89,7 +90,7 @@ public class App {
             }
             db.create();
         } catch (Exception e) {
-            System.out.printf("Failed to initialize database: %s\n", e.getMessage());
+            log.error("Failed to initialize database: {}", e.getMessage());
         }
 
         final boolean fetchAll = maxInspections < 0;
@@ -97,6 +98,8 @@ public class App {
         final int pageSize = !fetchAll && maxInspectionsPage > maxInspections
                 ? maxInspections
                 : maxInspectionsPage;
+
+        log.info("Starting ingest of {} records.", fetchAll ? "all" : maxInspections);
 
         try (final RestaurantInspectionDao dao = db.getRestaurantInspectionDao()) {
             final Observable<RestaurantInspection> inspections = fetchAll
@@ -114,16 +117,15 @@ public class App {
                                     ri.businessID,
                                     ri.cuisine,
                                     ri.violationCode,
+                                    ri.violationDescription,
                                     ri.score,
                                     ri.inspectionType
                             )
                     ));
 
-        } catch (final Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
+            // TODO: error handling for a failed inspection
         }
 
-        System.out.println("Done ingest");
+        log.info("Ingest completed.");
     }
 }

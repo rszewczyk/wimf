@@ -31,6 +31,7 @@ public class RestaurantInspectionTests {
                 "some business ID",
                 "some cuisine",
                 "some violation code",
+                "some really bad stuff",
                 23,
                 "some inspection type");
 
@@ -54,6 +55,7 @@ public class RestaurantInspectionTests {
                 "some business ID",
                 "some cuisine",
                 "some violation code",
+                "some really bad stuff",
                 23,
                 "some inspection type");
 

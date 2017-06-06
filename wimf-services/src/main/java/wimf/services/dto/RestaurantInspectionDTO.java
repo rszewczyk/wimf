@@ -18,6 +18,7 @@ public final class RestaurantInspectionDTO {
                 inspection.businessID,
                 inspection.cuisine,
                 inspection.violationCode,
+                inspection.violationDescription,
                 inspection.score,
                 inspection.inspectionType);
     }
@@ -28,16 +29,6 @@ public final class RestaurantInspectionDTO {
                 .collect(ImmutableList.toImmutableList());
     }
 
-    public final String businessName;
-    public final String boro;
-    public final String grade;
-    public final LocalDateTime inspectionDate;
-    public final String businessID;
-    public final String cuisine;
-    public final String violationCode;
-    public final int score;
-    public final String inspectionType;
-
     @JsonCreator
     public static RestaurantInspectionDTO of(@JsonProperty("businessName") final String businessName,
                                              @JsonProperty("boro") final String boro,
@@ -46,6 +37,7 @@ public final class RestaurantInspectionDTO {
                                              @JsonProperty("businessID") final String businessID,
                                              @JsonProperty("cuisine") final String cuisine,
                                              @JsonProperty("violationCode") final String violationCode,
+                                             @JsonProperty("violationDescription") final String violationDescription,
                                              @JsonProperty("score") final int score,
                                              @JsonProperty("inspectionType") final String inspectionType) {
         return new RestaurantInspectionDTO(
@@ -56,9 +48,21 @@ public final class RestaurantInspectionDTO {
                 businessID,
                 cuisine,
                 violationCode,
+                violationDescription,
                 score,
                 inspectionType);
     }
+
+    public final String businessName;
+    public final String boro;
+    public final String grade;
+    public final LocalDateTime inspectionDate;
+    public final String businessID;
+    public final String cuisine;
+    public final String violationCode;
+    public final String violationDescription;
+    public final int score;
+    public final String inspectionType;
 
     private RestaurantInspectionDTO(final String businessName,
                                     final String boro,
@@ -67,6 +71,7 @@ public final class RestaurantInspectionDTO {
                                     final String businessID,
                                     final String cuisine,
                                     final String violationCode,
+                                    final String violationDescription,
                                     final int score,
                                     final String inspectionType) {
 
@@ -77,6 +82,7 @@ public final class RestaurantInspectionDTO {
         this.businessID = businessID;
         this.cuisine = cuisine;
         this.violationCode = violationCode;
+        this.violationDescription = violationDescription;
         this.score = score;
         this.inspectionType = inspectionType;
     }

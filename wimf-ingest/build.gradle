@@ -18,7 +18,10 @@ dependencies {
     compile "org.jdbi:jdbi3:$versions.jdbi"
     compile "org.jdbi:jdbi3-sqlobject:$versions.jdbi"
 
-    "org.postgresql:postgresql:$versions.postgres"
+    compile "org.postgresql:postgresql:$versions.postgres"
+
+    compile "org.slf4j:slf4j-api:$versions.slf4j"
+    compile "ch.qos.logback:logback-classic:$versions.logback"
 
     compile "com.beust:jcommander:$versions.jcommander"
 

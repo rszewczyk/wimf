@@ -142,10 +142,12 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
                         "business_id, " +
                         "cuisine, " +
                         "violation_code, " +
+                        "violation_description, " +
                         "score, " +
                         "inspection_type) " +
                 "VALUES (:businessName, :boro, :grade, :inspectionDate, " +
-                        ":businessID, :cuisine, :violationCode, :score, :inspectionType)")
+                        ":businessID, :cuisine, :violationCode, :violationDescription, " +
+                        ":score, :inspectionType)")
         void insert(@BindBean RestaurantInspection inspection);
 
         @RegisterRowMapper(RestaurantInspectionMapper.class)
@@ -213,6 +215,7 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
                     r.getString("business_id"),
                     r.getString("cuisine"),
                     r.getString("violation_code"),
+                    r.getString("violation_description"),
                     r.getInt("score"),
                     r.getString("inspection_type"));
         }

@@ -87,6 +87,7 @@ public class RestaurantInspectionsSummaryResourceTests extends ResourceTest {
                         "businessA",
                         "Food Type 3",
                         "1A",
+                        "some really bad stuff",
                         23,
                         "type 1"),
                 new RestaurantInspection(
@@ -97,6 +98,7 @@ public class RestaurantInspectionsSummaryResourceTests extends ResourceTest {
                         "businessB",
                         "Food Type 1",
                         "3B",
+                        "some really bad stuff",
                         16,
                         "type 2"),
                 new RestaurantInspection(
@@ -107,6 +109,7 @@ public class RestaurantInspectionsSummaryResourceTests extends ResourceTest {
                         "businessA",
                         "Food Type 3",
                         "3B",
+                        "some really bad stuff",
                         7,
                         "type 1"),
                 new RestaurantInspection(
@@ -117,6 +120,7 @@ public class RestaurantInspectionsSummaryResourceTests extends ResourceTest {
                         "businessD",
                         "Food Type 2",
                         "1A",
+                        "some really bad stuff",
                         7,
                         "type 1"),
                 new RestaurantInspection(
@@ -127,6 +131,7 @@ public class RestaurantInspectionsSummaryResourceTests extends ResourceTest {
                         "businessD",
                         "Food Type 1",
                         "2A",
+                        "some really bad stuff",
                         14,
                         "type 3")
         );
