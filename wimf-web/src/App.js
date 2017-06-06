@@ -5,6 +5,13 @@ import { Brush } from "recharts";
 import debounce from "lodash/debounce";
 import MultiSeriesChart from "./MultiSeriesChart";
 import type { FetcherComponentProps } from "./fetcher";
+import Loader from "./Loader";
+import Filter from "./Filter";
+import Page from "./Page";
+import Column from "./Column";
+import Overflow from "./Overflow";
+import Button from "./Button";
+import ButtonBar from "./ButtonBar";
 
 const months = [
   "Jan",
@@ -20,6 +27,16 @@ const months = [
   "Nov",
   "Dec"
 ];
+
+function clearSelection() {
+  if (window.getSelection) {
+    if (window.getSelection().empty) {
+      window.getSelection().empty();
+    } else if (window.getSelection().removeAllRanges) {
+      window.getSelection().removeAllRanges();
+    }
+  }
+}
 
 type Term = {
   value: string,
@@ -77,7 +94,8 @@ type AppState = {
   filters: Filters,
   dateRange: Array<Date>,
   startDateIndex: number,
-  endDateIndex: number
+  endDateIndex: number,
+  resetDates: boolean
 };
 
 function twoDigit(n: number): string {
@@ -123,6 +141,7 @@ export function createRequest(state: AppState): string {
 
 export default class App extends Component {
   props: FetcherComponentProps;
+
   state: AppState = {
     filters: {
       inspection_type: [],
@@ -130,8 +149,9 @@ export default class App extends Component {
       boro: []
     },
     dateRange: [],
-    startDateIndex: -1,
-    endDateIndex: -1
+    startDateIndex: 0,
+    endDateIndex: 0,
+    resetDates: true
   };
 
   dateRangeChange = debounce(
@@ -147,8 +167,9 @@ export default class App extends Component {
           ...indexState
         })
       );
+      clearSelection();
     },
-    750,
+    500,
     {
       trailing: true
     }
@@ -165,37 +186,36 @@ export default class App extends Component {
     });
   };
 
-  clearFilters = (e: Event) => {
-    e.preventDefault();
+  clearFilters = () => {
     const cleared = {
+      ...this.state,
       filters: {
         inspection_type: [],
         cuisine: [],
         boro: []
       },
-      dateRange: [],
-      startDateIndex: -1,
-      endDateIndex: -1
+      resetDates: true
     };
     this.setState(cleared);
     this.props.fetch(createRequest(cleared));
   };
 
-  applyFilters = (e: Event) => {
-    e.preventDefault();
+  applyFilters = () => {
     this.props.fetch(createRequest(this.state));
   };
 
   componentWillReceiveProps(nextProps: FetcherComponentProps) {
     const { data } = nextProps;
 
-    if (data && !this.props.data) {
+    if (data && this.state.resetDates) {
       const [min, max] = [new Date(data.minDate), new Date(data.maxDate)];
       const dateRange = [time.timeMonth(min), ...time.timeMonths(min, max)];
+
       this.setState({
         dateRange,
         startDateIndex: 0,
-        endDateIndex: dateRange.length - 1
+        endDateIndex: dateRange.length - 1,
+        resetDates: false
       });
     }
   }
@@ -203,7 +223,7 @@ export default class App extends Component {
   render() {
     const { data, error, loading } = this.props;
     if (!data) {
-      return loading ? <div>loading</div> : <div>no data!</div>;
+      return loading ? <Loader visible /> : <div>no data!</div>;
     }
     if (error) {
       return <div children={error.message} />;
@@ -220,67 +240,63 @@ export default class App extends Component {
     const { filters, dateRange, startDateIndex, endDateIndex } = this.state;
 
     return (
-      <div>
-        <div>
-          <label>Boro</label>
-          <select
+      <Page>
+        <Column width={2}>
+          <h3 style={{ marginLeft: "0.5rem" }}>Filters:</h3>
+          <Filter
+            name="Boro"
             value={filters.boro}
-            multiple
             onChange={this.filterChange.bind(null, "boro")}
-          >
-            {terms.boro.map((t, i) =>
-              <option key={i} value={t} children={t} />
-            )}
-          </select>
-          <label>Cuisine</label>
-          <select
-            value={filters.cuisine}
-            multiple
-            onChange={this.filterChange.bind(null, "cuisine")}
-          >
-            {terms.cuisine.map((t, i) =>
-              <option key={i} value={t} children={t} />
-            )}
-          </select>
-          <label>Inspection Type</label>
-          <select
-            value={filters.inspection_type}
-            multiple
-            onChange={this.filterChange.bind(null, "inspection_type")}
-          >
-            {terms.inspection_type.map((t, i) =>
-              <option key={i} value={t} children={t} />
-            )}
-          </select>
-          <button onClick={this.applyFilters} children="apply" />
-          <button onClick={this.clearFilters} children="clear" />
-        </div>
-        <MultiSeriesChart
-          type="line"
-          data={dateMonthCounts(gradesByDate, dateRange)}
-        >
-          <Brush
-            dataKey="name"
-            height={30}
-            stroke="#8884d8"
-            onChange={this.dateRangeChange}
-            startIndex={startDateIndex}
-            endIndex={endDateIndex}
+            options={terms.boro}
           />
-        </MultiSeriesChart>
-        <MultiSeriesChart
-          type="bar"
-          data={termCounts(gradesByBoro, terms.boro)}
-        />
-        <MultiSeriesChart
-          type="barStacked"
-          data={termCounts(gradesByCuisine, terms.cuisine)}
-        />
-        <MultiSeriesChart
-          type="bar"
-          data={termCounts(gradesByInspectionType, terms.inspection_type)}
-        />
-      </div>
+          <Filter
+            name="Cuisine"
+            value={filters.cuisine}
+            onChange={this.filterChange.bind(null, "cuisine")}
+            options={terms.cuisine}
+          />
+          <Filter
+            name="Inspection Type"
+            value={filters.inspection_type}
+            onChange={this.filterChange.bind(null, "inspection_type")}
+            options={terms.inspection_type}
+          />
+          <ButtonBar>
+            <Button primary onClick={this.applyFilters} children="Apply" />
+            <Button onClick={this.clearFilters} children="Clear" />
+          </ButtonBar>
+        </Column>
+        <Column width={6}>
+          <Overflow>
+            <MultiSeriesChart
+              type="line"
+              data={dateMonthCounts(gradesByDate, dateRange)}
+            >
+              <Brush
+                dataKey="name"
+                height={30}
+                stroke="#8884d8"
+                onChange={this.dateRangeChange}
+                startIndex={startDateIndex}
+                endIndex={endDateIndex}
+              />
+            </MultiSeriesChart>
+            <MultiSeriesChart
+              type="bar"
+              data={termCounts(gradesByBoro, terms.boro)}
+            />
+            <MultiSeriesChart
+              type="barStacked"
+              data={termCounts(gradesByCuisine, terms.cuisine)}
+            />
+            <MultiSeriesChart
+              type="bar"
+              data={termCounts(gradesByInspectionType, terms.inspection_type)}
+            />
+          </Overflow>
+        </Column>
+        <Loader visible={loading} />
+      </Page>
     );
   }
 }
