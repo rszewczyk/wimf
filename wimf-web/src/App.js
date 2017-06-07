@@ -15,6 +15,7 @@ import List from "./List";
 import Pane from "./Pane";
 import Inspection from "./Inspection";
 import wrapWithFetcher from "./fetcher";
+import "./cssReset";
 
 const months = [
   "Jan",

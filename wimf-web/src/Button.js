@@ -18,7 +18,10 @@ const buttonStyle = css({
   margin: 0,
   border: "1px solid transparent",
   verticalAlign: "middle",
-  borderRadius: "4px"
+  borderRadius: "4px",
+  ":hover": {
+    boxShadow: "inset 0 0 0 10rem rgba(0,0,0,.075)"
+  }
 });
 
 const buttonPrimaryStyle = merge(buttonStyle, {

@@ -19,7 +19,7 @@ const filterStyle = css(
   select(" label", {
     fontSize: ".875rem",
     fontWeight: 700,
-    marginBottom: "1rem"
+    marginBottom: "0.5rem"
   }),
   select(" select", {
     height: "100px"

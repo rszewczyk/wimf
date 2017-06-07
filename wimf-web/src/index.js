@@ -1,11 +1,11 @@
 // @flow
 import React from "react";
 import ReactDOM from "react-dom";
-import "glamor-reset";
 import { plugins } from "glamor";
+import prefixer from "glamor-autoprefixer";
 import App from "./App";
 
-plugins.add("glamor-autoprefixer");
+plugins.add(prefixer);
 
 ReactDOM.render(
   <App initialRequest="/api/summary" />,
