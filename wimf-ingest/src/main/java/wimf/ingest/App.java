@@ -4,13 +4,14 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import io.reactivex.Observable;
+import io.reactivex.observables.ConnectableObservable;
+import org.assertj.core.util.Strings;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wimf.domain.Database;
-import wimf.domain.PostgresDatabase;
-import wimf.domain.RestaurantInspectionDao;
+import wimf.domain.*;
+import wimf.domain.Business;
 
 import java.util.stream.Collectors;
 
@@ -21,10 +22,13 @@ public class App {
     private static final Logger log = LoggerFactory.getLogger(App.class);
 
     @Parameter(names = "--max-inspections", description = "The maximum number of inspections to ingest")
-    protected int maxInspections = -1;
+    protected int maxInspections = 0;
 
     @Parameter(names="--max-inspections-page", description = "The maximum number of inspections to fetch in a single Open New York API call")
     protected int maxInspectionsPage = 10_000;
+
+    @Parameter(names = "--max-yelp-records", description = "The maximum number of yelp records to ingest")
+    protected int maxYelpRecords = 0;
 
     @Parameter(names="--drop", description = "Drop the database before starting ingest")
     protected boolean drop = false;
@@ -41,6 +45,8 @@ public class App {
     @Parameter(names = "--help", description = "Display usage then exit", help = true)
     private boolean help = false;
 
+    private String yelpToken = "";
+
     public static void main(String[] argv) throws Exception {
         final App app = new App();
 
@@ -54,6 +60,8 @@ public class App {
             e.usage();
             System.exit(1);
         }
+
+        app.yelpToken = System.getenv("YELP_API_TOKEN");
 
         if (app.help) {
             jc.usage();
@@ -97,21 +105,35 @@ public class App {
             log.error("Failed to initialize database: {}", e.getMessage());
         }
 
-        final boolean fetchAll = maxInspections < 0;
+        final boolean fetchAllInspection = maxInspections <= 0;
 
-        final int pageSize = !fetchAll && maxInspectionsPage > maxInspections
+        final int pageSize = !fetchAllInspection && maxInspectionsPage > maxInspections
                 ? maxInspections
                 : maxInspectionsPage;
 
-        log.info("Starting ingest of {} records.", fetchAll ? "all" : maxInspections);
+        log.info("Starting ingest of {} NY Open data records.", fetchAllInspection ? "all" : maxInspections);
 
         try (final RestaurantInspectionDao dao = db.getRestaurantInspectionDao()) {
-            final Observable<RestaurantInspection> inspections = fetchAll
+            final Observable<RestaurantInspection> inspections = (fetchAllInspection
                     ? new RestaurantInspectionConsumer(pageSize).getAll()
-                    : new RestaurantInspectionConsumer(pageSize).getAll().take(maxInspections);
+                    : new RestaurantInspectionConsumer(pageSize).getAll().take(maxInspections));
 
             inspections.buffer(1000).forEach(rib ->
                     save(dao, rib.stream().map(RestaurantInspection::asModel).collect(Collectors.toList())));
+
+            log.info("NY Open data ingest complete.");
+
+            if (!Strings.isNullOrEmpty(yelpToken)) {
+                final boolean fetchAllYelp = maxYelpRecords <= 0;
+                log.info("Starting ingest of {} Yelp records", fetchAllYelp ? "all" : maxYelpRecords);
+
+                YelpListingConsumer yelpListingConsumer = new YelpListingConsumer(yelpToken);
+
+                yelpListingConsumer
+                        .getListings(inspections.distinct(ri -> ri.businessID))
+                        .buffer(10)
+                        .forEach(b -> Business.save(dao, b));
+            }
 
             // TODO: error handling for a failed inspection
         }

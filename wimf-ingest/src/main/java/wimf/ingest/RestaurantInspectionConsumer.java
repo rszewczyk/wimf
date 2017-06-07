@@ -12,6 +12,7 @@ import io.reactivex.Observable;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * returns a stream of restaurant inspections from New York Open Data
@@ -54,7 +55,7 @@ final class RestaurantInspectionConsumer {
                                                 "grade IS NOT NULL AND " +
                                                 "violation_code IS NOT NULL AND " +
                                                 "cuisine_description IS NOT NULL ")
-                                        .setOrderByPhrase(Arrays.asList(
+                                        .setOrderByPhrase(Collections.singletonList(
                                                 new OrderByClause(SortOrder.Descending, "inspection_date")))
                                         .setOffset(pageNumber * pageSize)
                                         .setLimit(pageSize)

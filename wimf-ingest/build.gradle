@@ -13,6 +13,11 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
     compile "com.fasterxml.jackson.core:jackson-annotations:$versions.jackson"
 
+    compile "org.glassfish.jersey.core:jersey-client:$versions.jersey"
+    compile ("org.glassfish.jersey.media:jersey-media-json-jackson:$versions.jersey") {
+        exclude group: 'com.fasterxml.jackson.core'
+    }
+
     compile "javax.validation:validation-api:$versions.validationAPI"
 
     compile "org.jdbi:jdbi3:$versions.jdbi"
@@ -27,7 +32,7 @@ dependencies {
 
     compile "io.reactivex.rxjava2:rxjava:$versions.rxjava"
 
-    compile 'com.socrata:soda-api-java:0.9.12'
+    compile 'com.socrata:soda-api-java:0.9.13'
 
     testCompile "junit:junit:$versions.junit"
     testCompile "org.assertj:assertj-core:$versions.assertj"
