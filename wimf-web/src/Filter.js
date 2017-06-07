@@ -33,9 +33,9 @@ export default function Filter(props: FilterProps) {
     <div {...filterStyle}>
       <label>{name}</label>
       <select value={value} multiple onChange={onChange}>
-        {options.map((t, i) =>
-          <option key={i} value={t} children={t} title={t} />
-        )}
+        {options
+          .filter(o => !!o)
+          .map((t, i) => <option key={i} value={t} children={t} title={t} />)}
       </select>
     </div>
   );

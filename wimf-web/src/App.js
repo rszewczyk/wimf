@@ -84,7 +84,11 @@ export function termCounts(buckets: Buckets, terms: Array<string>) {
     });
   });
 
-  keys.forEach(k => buckets[k].forEach(v => (counts[v.value][k] += v.count)));
+  keys.forEach(k =>
+    buckets[k]
+      .filter(v => !!v.value)
+      .forEach(v => (counts[v.value][k] += v.count))
+  );
 
   return terms
     .map(t => counts[t])
@@ -94,7 +98,8 @@ export function termCounts(buckets: Buckets, terms: Array<string>) {
 type Filters = {
   inspection_type: Array<string>,
   cuisine: Array<string>,
-  boro: Array<string>
+  boro: Array<string>,
+  price: Array<string>
 };
 
 type AppState = {
@@ -168,7 +173,8 @@ export class App extends Component {
     filters: {
       inspection_type: [],
       cuisine: [],
-      boro: []
+      boro: [],
+      price: []
     },
     dateRange: [],
     startDateIndex: 0,
@@ -219,7 +225,8 @@ export class App extends Component {
       filters: {
         inspection_type: [],
         cuisine: [],
-        boro: []
+        boro: [],
+        price: []
       },
       resetDateRange: true,
       resetInspections: true
@@ -278,6 +285,7 @@ export class App extends Component {
       gradesByBoro,
       gradesByCuisine,
       gradesByInspectionType,
+      gradesByPrice,
       terms,
       total
     } = data;
@@ -313,6 +321,12 @@ export class App extends Component {
               onChange={this.filterChange.bind(null, "inspection_type")}
               options={terms.inspection_type}
             />
+            <Filter
+              name="Price"
+              value={filters.price}
+              onChange={this.filterChange.bind(null, "price")}
+              options={terms.price}
+            />
             <ButtonBar>
               <Button primary onClick={this.applyFilters} children="Apply" />
               <Button onClick={this.clearFilters} children="Clear" />
@@ -344,7 +358,7 @@ export class App extends Component {
             />
             <MultiSeriesChart
               title="Grades by Cuisine"
-              description="Grade broken down by the type of food served by the establishment"
+              description="Grades broken down by the type of food served by the establishment"
               type="barStacked"
               data={termCounts(gradesByCuisine, terms.cuisine)}
             />
@@ -352,6 +366,12 @@ export class App extends Component {
               title="Grades by Inspection Type"
               type="bar"
               data={termCounts(gradesByInspectionType, terms.inspection_type)}
+            />
+            <MultiSeriesChart
+              title="Grades by Price"
+              description="Grades broken down by the Yelp price range of the establishment."
+              type="bar"
+              data={termCounts(gradesByPrice, terms.price)}
             />
             <List
               title="Inspection Results"
