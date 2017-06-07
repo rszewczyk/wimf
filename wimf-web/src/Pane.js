@@ -1,20 +1,29 @@
 // @flow
 import React from "react";
-import { css } from "glamor";
+import { css, merge } from "glamor";
 
 type PaneProps = {
-  children?: any
+  children?: any,
+  border?: boolean,
+  style?: {
+    [string]: string
+  }
 };
 
 const paneStyle = css({
-  paddingLeft: "0.5rem",
-  paddingRight: "0.5rem"
+  padding: "1rem"
+});
+
+const withBorder = merge(paneStyle, {
+  border: "1px solid gray",
+  borderRadius: "3px"
 });
 
 export default function Pane(props: PaneProps) {
+  const { border, style, children } = props;
   return (
-    <div {...paneStyle}>
-      {props.children}
+    <div {...(border ? withBorder : paneStyle)} style={style}>
+      {children}
     </div>
   );
 }
