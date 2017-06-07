@@ -13,6 +13,8 @@ public abstract class RestaurantInspectionDao implements AutoCloseable {
 
     abstract protected void insert(final List<RestaurantInspection> inspections);
 
+    abstract protected void insertBusinesses(final List<Business> businesses);
+
     abstract protected List<RestaurantInspection> fetchPage(final int limit,
                                                             final int offset,
                                                             final List<String> sort);

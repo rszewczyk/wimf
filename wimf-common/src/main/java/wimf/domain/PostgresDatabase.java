@@ -35,12 +35,19 @@ public final class PostgresDatabase implements Database {
                     "violation_description VARCHAR, " +
                     "score INTEGER, " +
                     "inspection_type VARCHAR)");
+
+            handle.execute("CREATE TABLE business (" +
+                    "id SERIAL PRIMARY KEY, " +
+                    "business_id VARCHAR, " +
+                    "price VARCHAR, " +
+                    "rating REAL)");
         }
     }
 
     public void drop() {
         try (final Handle handle = jdbi.open()) {
             handle.execute("DROP TABLE IF EXISTS restaurant_inspection");
+            handle.execute("DROP TABLE IF EXISTS business");
         }
     }
 

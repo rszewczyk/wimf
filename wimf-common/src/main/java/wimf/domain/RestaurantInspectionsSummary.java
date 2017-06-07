@@ -32,6 +32,7 @@ public final class RestaurantInspectionsSummary {
                 getGradesAgg(dao, params.filters, "boro"),
                 getGradesAgg(dao, params.filters, "cuisine"),
                 getGradesAgg(dao, params.filters, "inspection_type"),
+                getGradesAgg(dao, params.filters, "price"),
                 getTerms(dao));
     }
 
@@ -43,6 +44,7 @@ public final class RestaurantInspectionsSummary {
     public final Map<String, List<Aggregation<String>>> gradesByBoro;
     public final Map<String, List<Aggregation<String>>> gradesByCuisine;
     public final Map<String, List<Aggregation<String>>> gradesByInspectionType;
+    public final Map<String, List<Aggregation<String>>> gradesByPrice;
     public final Map<String, List<String>> terms;
 
     RestaurantInspectionsSummary(final long total,
@@ -53,6 +55,7 @@ public final class RestaurantInspectionsSummary {
                                  final Map<String, List<Aggregation<String>>> gradesByBoro,
                                  final Map<String, List<Aggregation<String>>> gradesByCuisine,
                                  final Map<String, List<Aggregation<String>>> gradesByInspectionType,
+                                 final Map<String, List<Aggregation<String>>> gradesByPrice,
                                  final Map<String, List<String>> terms) {
         this.total = total;
         this.gradeTotal = gradeTotal;
@@ -62,6 +65,7 @@ public final class RestaurantInspectionsSummary {
         this.gradesByBoro = gradesByBoro;
         this.gradesByCuisine = gradesByCuisine;
         this.gradesByInspectionType = gradesByInspectionType;
+        this.gradesByPrice = gradesByPrice;
         this.terms = terms;
     }
 
@@ -79,7 +83,7 @@ public final class RestaurantInspectionsSummary {
 
         ImmutableMap.Builder<String, List<String>> terms = ImmutableMap.builder();
 
-        Arrays.asList("cuisine", "boro", "inspection_type").forEach(t -> terms.put(t, dao.groupTerms(t)));
+        Arrays.asList("cuisine", "boro", "inspection_type", "price").forEach(t -> terms.put(t, dao.groupTerms(t)));
 
         return terms.build();
     }

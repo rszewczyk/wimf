@@ -40,9 +40,15 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     }
 
     @Override
+    protected void insertBusinesses(final List<Business> businesses) {
+        dao.insertBusinesses(businesses);
+    }
+
+    @Override
     protected List<RestaurantInspection> fetchPage(final int limit,
                                                    final int offset,
                                                    final List<String> sort) {
+
         return dao.fetchPage(limit, offset, RestaurantInspectionUtil.getOrderByClause(sort));
     }
 
@@ -131,11 +137,12 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
     private static final String GRADE_AGG_QUERY =
             "SELECT <select> agg, count(*) count " +
             "FROM (" +
-                "SELECT inspection_date, business_id, grade, score, boro, cuisine, inspection_type " +
+                "SELECT inspection_date, restaurant_inspection.business_id, grade, score, boro, cuisine, inspection_type " +
                 "FROM restaurant_inspection " +
                 "<where> " +
-                "GROUP BY inspection_date, business_id, grade, score, boro, cuisine, inspection_type " +
+                "GROUP BY inspection_date, restaurant_inspection.business_id, grade, score, boro, cuisine, inspection_type " +
             ") sub " +
+            "LEFT JOIN business ON sub.business_id=business.business_id " +
             "GROUP BY agg ORDER BY <order>";
 
     private static final String INSERT_QUERY =
@@ -161,14 +168,17 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
         @SqlBatch(INSERT_QUERY)
         void insert(@BindBean List<RestaurantInspection> inspection);
 
+        @SqlBatch("INSERT INTO business (price, rating, business_id) VALUES (:price, :rating, :businessId)")
+        void insertBusinesses(@BindBean List<Business> businesses);
+
         @RegisterRowMapper(RestaurantInspectionMapper.class)
-        @SqlQuery("SELECT * from restaurant_inspection ORDER BY <order> LIMIT :limit OFFSET :offset")
+        @SqlQuery("SELECT * from restaurant_inspection LEFT JOIN business ON restaurant_inspection.business_id=business.business_id ORDER BY <order> LIMIT :limit OFFSET :offset")
         List<RestaurantInspection> fetchPage(@Bind("limit") int limit,
                                              @Bind("offset") int offset,
                                              @Define("order") String order);
 
         @RegisterRowMapper(RestaurantInspectionMapper.class)
-        @SqlQuery("SELECT * from restaurant_inspection <where> ORDER BY <order> LIMIT :limit OFFSET :offset")
+        @SqlQuery("SELECT * from restaurant_inspection LEFT JOIN business ON restaurant_inspection.business_id=business.business_id <where> ORDER BY <order> LIMIT :limit OFFSET :offset")
         List<RestaurantInspection> fetchPage(@Bind("limit") int limit,
                                              @Bind("offset") int offset,
                                              @Define("order") String order,
@@ -176,20 +186,23 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
                                              @BindMap Map<String, Object> whereVals);
 
         @RegisterRowMapper(CountMapper.class)
-        @SqlQuery("SELECT count(*) from restaurant_inspection <where>")
+        @SqlQuery("SELECT count(*) from restaurant_inspection LEFT JOIN business ON restaurant_inspection.business_id=business.business_id <where>")
         long count(@Define("where") String where, @BindMap Map<String, Object> whereVals);
 
         @RegisterRowMapper(CountMapper.class)
         @SqlQuery("SELECT count(*) " +
                   "FROM (" +
-                      "SELECT inspection_date, business_id, grade, score, boro, cuisine, inspection_type " +
+                      "SELECT inspection_date, restaurant_inspection.business_id, grade, score, boro, cuisine, inspection_type " +
                       "FROM restaurant_inspection " +
                       "<where> " +
-                      "GROUP BY inspection_date, business_id, grade, score, boro, cuisine, inspection_type " +
+                      "GROUP BY inspection_date, restaurant_inspection.business_id, grade, score, boro, cuisine, inspection_type " +
                   ") sub")
         long countGrades(@Define("where") String where, @BindMap Map<String, Object> whereVals);
 
-        @SqlQuery("SELECT <select> agg FROM restaurant_inspection GROUP BY agg")
+        @SqlQuery("SELECT <select> agg " +
+                  "FROM restaurant_inspection " +
+                  "LEFT JOIN business ON restaurant_inspection.business_id=business.business_id " +
+                  "GROUP BY agg")
         List<String> groupTerms(@Define("select") String aggName);
 
         @RegisterRowMapper(StringAggregationMapper.class)

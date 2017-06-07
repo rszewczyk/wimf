@@ -34,6 +34,12 @@ public final class HsqlDatabase implements Database {
                     "violation_description VARCHAR(1000), " +
                     "score INTEGER, "+
                     "inspection_type VARCHAR(255))");
+
+            handle.execute("CREATE TABLE business (" +
+                    "id INTEGER IDENTITY PRIMARY KEY, " +
+                    "business_id VARCHAR(255), " +
+                    "price VARCHAR(255), " +
+                    "rating DECIMAL)");
         }
     }
 
@@ -41,6 +47,7 @@ public final class HsqlDatabase implements Database {
     public void drop() {
         try (final Handle handle = jdbi.open()) {
             handle.execute("DROP TABLE IF EXISTS restaurant_inspection");
+            handle.execute("DROP TABLE IF EXISTS business");
         }
     }
 
