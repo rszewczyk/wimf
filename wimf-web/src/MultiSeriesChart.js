@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from "react";
-import { css } from "glamor";
 import {
   ResponsiveContainer,
   LineChart,
