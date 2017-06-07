@@ -139,6 +139,7 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
             "FROM (" +
                 "SELECT inspection_date, restaurant_inspection.business_id, grade, score, boro, cuisine, inspection_type " +
                 "FROM restaurant_inspection " +
+                "LEFT JOIN business ON restaurant_inspection.business_id=business.business_id " +
                 "<where> " +
                 "GROUP BY inspection_date, restaurant_inspection.business_id, grade, score, boro, cuisine, inspection_type " +
             ") sub " +
@@ -194,6 +195,7 @@ final class RestaurantInspectionDaoImpl extends RestaurantInspectionDao {
                   "FROM (" +
                       "SELECT inspection_date, restaurant_inspection.business_id, grade, score, boro, cuisine, inspection_type " +
                       "FROM restaurant_inspection " +
+                      "LEFT JOIN business ON restaurant_inspection.business_id=business.business_id " +
                       "<where> " +
                       "GROUP BY inspection_date, restaurant_inspection.business_id, grade, score, boro, cuisine, inspection_type " +
                   ") sub")

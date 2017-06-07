@@ -1,5 +1,6 @@
 package wimf.domain;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import java.time.LocalDateTime;
@@ -28,7 +29,9 @@ final class RestaurantInspectionUtil {
             return "inspection_date DESC";
         }
 
-        return String.join(", ", sort);
+        return String.join(", ", sort.stream()
+                .map(s -> s.startsWith("business_id") ? "restaurant_inspection." + s : s)
+                .collect(ImmutableList.toImmutableList()));
     }
 
     /**
@@ -47,7 +50,7 @@ final class RestaurantInspectionUtil {
 
         for(int i = 0; i < filter.size(); i++) {
             final String[] tokens = filter.get(i).split(FILTER_SPLITTER);
-            final String filterName = tokens[0];
+            final String filterName = rewriteFilterName(tokens[0]);
             final String op = tokens[1].equals("!") ? "!=" : tokens[1];
 
             // clause is the name, op and a named parameter - e.g. `filter_name<:filter1`
@@ -69,6 +72,14 @@ final class RestaurantInspectionUtil {
         }
 
         return String.join(" AND ", clauses);
+    }
+
+    static String rewriteFilterName(final String field) {
+        if (field.equals("business_id")) {
+            return "restaurant_inspection.business_id";
+        }
+
+        return field;
     }
 
     /**
