@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  data-css-12i5fdo=""
+>
+  <h3>
+    some title
+  </h3>
+</div>
+`;
+
+exports[`renders correctly 2`] = `
+<div
+  data-css-12i5fdo=""
+>
+  <h3>
+    some title
+  </h3>
+  <div>
+    some description
+  </div>
+</div>
+`;

@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  data-css-1upbc3x=""
+>
+  <h1>
+    hello!
+  </h1>
+  <p>
+    foo
+  </p>
+</div>
+`;

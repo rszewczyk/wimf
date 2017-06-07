@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  data-css-m0eymj=""
+  style={
+    Object {
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
+  <h1>
+    hello!
+  </h1>
+  <p>
+    foo
+  </p>
+</div>
+`;
+
+exports[`renders correctly 2`] = `
+<div
+  data-css-emxoea=""
+  style={
+    Object {
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
+  <h1>
+    hello!
+  </h1>
+  <p>
+    foo
+  </p>
+</div>
+`;
+
+exports[`renders correctly 3`] = `
+<div
+  data-css-emxoea=""
+  style={
+    Object {
+      "marginBottom": "1.0rem",
+      "marginLeft": "0.875rem",
+      "marginRight": "0.875rem",
+      "marginTop": "1.0rem",
+    }
+  }
+>
+  <h1>
+    hello!
+  </h1>
+  <p>
+    foo
+  </p>
+</div>
+`;

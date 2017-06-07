@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  data-css-or04er=""
+>
+  <button
+    data-css-7ag5l5=""
+    onClick={undefined}
+  >
+    Submit
+  </button>
+</div>
+`;
+
+exports[`renders correctly 2`] = `
+<div
+  data-css-or04er=""
+>
+  <button
+    data-css-7ag5l5=""
+    onClick={undefined}
+  >
+    Submit
+  </button>
+  <button
+    data-css-7ag5l5=""
+    onClick={undefined}
+  >
+    Cancel
+  </button>
+</div>
+`;

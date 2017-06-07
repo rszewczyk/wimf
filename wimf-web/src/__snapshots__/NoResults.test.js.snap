@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  data-css-pxuxko=""
+>
+  <div>
+    No Results. Do you have a filter applied? Try widening your criteria.
+  </div>
+</div>
+`;

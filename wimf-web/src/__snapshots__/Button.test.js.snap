@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<button
+  data-css-7ag5l5=""
+  onClick={undefined}
+>
+  Submit
+</button>
+`;

@@ -11,6 +11,7 @@
     "lodash": "^4.17.4",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "react-test-renderer": "^15.5.4",
     "react-virtualized": "^9.7.6",
     "recharts": "^1.0.0-alpha.0"
   },

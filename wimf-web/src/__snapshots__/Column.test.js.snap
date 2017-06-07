@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  data-css-1t62idy=""
+  style={
+    Object {
+      "width": "12.45%",
+    }
+  }
+>
+  <p>
+    Hello
+  </p>
+</div>
+`;
+
+exports[`renders correctly 2`] = `
+<div
+  data-css-1t62idy=""
+  style={
+    Object {
+      "width": "37.349999999999994%",
+    }
+  }
+>
+  <div>
+    Foobar!!
+  </div>
+</div>
+`;
