@@ -25,6 +25,9 @@ public final class RestaurantInspectionsSummaryDTO {
         final ImmutableMap.Builder<String, List<StringAggregationDTO>> inspectionTypeBuilder = ImmutableMap.builder();
         summary.gradesByInspectionType.forEach((k, v) -> inspectionTypeBuilder.put(k, StringAggregationDTO.fromModels(v)));
 
+        final ImmutableMap.Builder<String, List<StringAggregationDTO>> priceBuilder = ImmutableMap.builder();
+        summary.gradesByPrice.forEach((k, v) -> priceBuilder.put(k, StringAggregationDTO.fromModels(v)));
+
         final ImmutableMap.Builder<String, List<String>> termsBuilder = ImmutableMap.builder();
         summary.terms.forEach(termsBuilder::put);
 
@@ -37,6 +40,7 @@ public final class RestaurantInspectionsSummaryDTO {
                 boroBuilder.build(),
                 cuisineBuilder.build(),
                 inspectionTypeBuilder.build(),
+                priceBuilder.build(),
                 termsBuilder.build());
     }
 
@@ -50,6 +54,7 @@ public final class RestaurantInspectionsSummaryDTO {
             @JsonProperty("gradesByBoro") final Map<String, List<StringAggregationDTO>> gradesByBoro,
             @JsonProperty("gradesByCuisine") final Map<String, List<StringAggregationDTO>> gradesByCuisine,
             @JsonProperty("gradesByInspectionType") final Map<String, List<StringAggregationDTO>> gradesByInspectionType,
+            @JsonProperty("gradesByPrice") final Map<String, List<StringAggregationDTO>> gradesByPrice,
             @JsonProperty("terms") final Map<String, List<String>> terms) {
 
         return new RestaurantInspectionsSummaryDTO(
@@ -61,6 +66,7 @@ public final class RestaurantInspectionsSummaryDTO {
                 ImmutableMap.copyOf(gradesByBoro),
                 ImmutableMap.copyOf(gradesByCuisine),
                 ImmutableMap.copyOf(gradesByInspectionType),
+                ImmutableMap.copyOf(gradesByPrice),
                 ImmutableMap.copyOf(terms));
     }
 
@@ -72,6 +78,7 @@ public final class RestaurantInspectionsSummaryDTO {
     public final Map<String, List<StringAggregationDTO>> gradesByBoro;
     public final Map<String, List<StringAggregationDTO>> gradesByCuisine;
     public final Map<String, List<StringAggregationDTO>> gradesByInspectionType;
+    public final Map<String, List<StringAggregationDTO>> gradesByPrice;
     public final Map<String, List<String>> terms;
 
     private RestaurantInspectionsSummaryDTO(final long total,
@@ -82,6 +89,7 @@ public final class RestaurantInspectionsSummaryDTO {
                                             final Map<String, List<StringAggregationDTO>> gradesByBoro,
                                             final Map<String, List<StringAggregationDTO>> gradesByCuisine,
                                             final Map<String, List<StringAggregationDTO>> gradesByInspectionType,
+                                            final Map<String, List<StringAggregationDTO>> gradesByPrice,
                                             final Map<String, List<String>> terms) {
         this.total = total;
         this.gradeTotal = gradeTotal;
@@ -91,6 +99,7 @@ public final class RestaurantInspectionsSummaryDTO {
         this.gradesByBoro = gradesByBoro;
         this.gradesByCuisine = gradesByCuisine;
         this.gradesByInspectionType = gradesByInspectionType;
+        this.gradesByPrice = gradesByPrice;
         this.terms = terms;
     }
 
