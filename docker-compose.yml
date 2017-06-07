@@ -6,6 +6,8 @@ services:
       - '5432'
   ingest:
     image: wimf/ingest
+    environment:
+      - YELP_API_TOKEN
     depends_on:
       - postgres
   services:
