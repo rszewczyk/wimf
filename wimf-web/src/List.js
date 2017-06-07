@@ -1,10 +1,12 @@
 // @flow
 import React, { Component } from "react";
-import { List } from "react-virtualized";
+import { List, AutoSizer } from "react-virtualized";
 import { css } from "glamor";
 import type { FetcherComponentProps } from "./fetcher";
 import wrapWithFetcher from "./fetcher";
 import Pane from "./Pane";
+import Title from "./Title";
+import NoResults from "./NoResults";
 
 const linkStyle = css({
   textDecoration: "underline",
@@ -84,23 +86,21 @@ export class FetchingList extends Component {
     const { list } = this.state;
     const { total, title, description } = this.props;
 
-    if (total === 0) {
-      return <div>No Data!</div>;
-    }
-
     return (
-      <Pane>
-        <div style={{ marginBottom: "1.0rem" }}>
-          <h3>{title}</h3>
-          {description && <div>{description}</div>}
-        </div>
-        <List
-          height={400}
-          width={800}
-          rowHeight={120}
-          rowRenderer={this.rowRenderer}
-          rowCount={list.length + 1}
-        />
+      <Pane marginY={1} border style={{ minWidth: "800px" }}>
+        <Title title={title} description={description} />
+        {total > 0
+          ? <AutoSizer disableHeight>
+              {({ width }) =>
+                <List
+                  height={400}
+                  width={width}
+                  rowHeight={120}
+                  rowRenderer={this.rowRenderer}
+                  rowCount={list.length + 1}
+                />}
+            </AutoSizer>
+          : <NoResults />}
       </Pane>
     );
   }

@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import Pane from "./Pane";
 import NoResults from "./NoResults";
+import Title from "./Title";
 
 const colors = [
   "#8884d8",
@@ -47,11 +48,8 @@ export default class ComboChart extends Component {
     const ChartComp = type === "line" ? LineChart : BarChart;
 
     return (
-      <Pane border>
-        <div>
-          <h3>{title}</h3>
-          {description && <div>{description}</div>}
-        </div>
+      <Pane border marginY={1}>
+        <Title title={title} description={description} />
         {hasData
           ? <ResponsiveContainer width="98%" height={300}>
               <ChartComp data={data}>
