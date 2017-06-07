@@ -45,5 +45,3 @@ docker {
         tag = 'wimf/services'
     }
 }
-
-build.dependsOn(dockerBuildImage)

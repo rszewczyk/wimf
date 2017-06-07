@@ -10,6 +10,28 @@ node {
     download = true
 }
 
+// avoids interactive test mode
+task testWithCi(type: Exec) {
+    dependsOn yarn_install
+    environment 'CI', 'true'
+    commandLine 'yarn', 'test'
+}
+
+// fails the build if there are linter errors
+task buildWithCi(type: Exec) {
+    dependsOn yarn_install, testWithCi, yarn_flow
+    environment 'CI', 'true'
+    commandLine 'yarn', 'build'
+}
+
+yarn_flow.dependsOn(yarn_install)
+yarn_start.dependsOn(yarn_install)
+
+task build(dependsOn: 'buildWithCi')
+task run(dependsOn: 'yarn_start')
+task test(dependsOn: ['testWithCi', 'yarn_flow'])
+task check(dependsOn: test)
+
 task createDockerfile(type: Dockerfile) {
     destFile = project.file('Dockerfile')
     from 'nginx:1'
@@ -18,14 +40,7 @@ task createDockerfile(type: Dockerfile) {
     copyFile('nginx.conf', '/etc/nginx/conf.d/default.conf')
 }
 
-task dockerBuildImage(type: DockerBuildImage, dependsOn: [createDockerfile, 'yarn_build']) {
+task dockerBuildImage(type: DockerBuildImage, dependsOn: [createDockerfile, buildWithCi]) {
     inputDir = project.file('.')
     tag = 'wimf/web'
 }
-
-task build(dependsOn: ['yarn_build', dockerBuildImage])
-task run(dependsOn: 'yarn_start')
-task test(dependsOn: 'yarn_test')
-task assemble(dependsOn: 'build')
-
-yarn_build.dependsOn(yarn_install)
