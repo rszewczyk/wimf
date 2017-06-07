@@ -62,7 +62,7 @@ Jersey resources.
 
 To be honest, this was a bit of a luxury choice. I've been wanting to dive into FRP style programming for awhile and I thought I had a somewhat decent use case for it here. And it
 did seem to work out well for the ingest side of things. I just barely scratched the surface with [JavaRx](https://github.com/ReactiveX/RxJava) and observables but I found it
-productive to think of processing event streams in the same way that I would a generic collection (map, reduce, etc). As bonus it turned out that testing these streams is very
+productive to think of processing event streams in the same way that I would a generic collection (map, reduce, etc). As a bonus it turns out that testing these streams is very
 straightforward.
 
 #### Other bits and pieces
@@ -75,7 +75,9 @@ straightforward.
 
 ## What did I Learn?
 
-I learned that this is relatively laborious way to build an application. But that was somewhat expected and intentional. It is also something that I'm sure gets easier with practice. However there are toolkits out there that potentially represent better tradeoffs in terms of the rapid development of something like Grails and the flexibility and greater control you get with this approach. When programming in Go, I frequently use [Gokit](https://gokit.io/) and for Java, [Dropwizard](http://www.dropwizard.io/0.9.2/docs/) looks promising.
+I learned that this is a relatively laborious way to build an application. But that was somewhat expected and intentional. It is also something that I'm sure gets easier with practice. The payoff was that I did find it edifying to deal directly with the details that in the past were hidden behind many layers of Grail/Spring/Hibernate. I feel like I have an incrementally better understanding of how to build multi tiered systems in Java.
+
+That being said however there are toolkits out there that potentially represent better tradeoffs in terms of the rapid development of something like Grails and the flexibility and greater control you get with this approach. When programming in Go, I frequently use [Gokit](https://gokit.io/) and for Java, [Dropwizard](http://www.dropwizard.io/0.9.2/docs/) looks promising.
 
 ## Prior art
 
