@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import * as time from "d3-time";
 import { Brush } from "recharts";
 import debounce from "lodash/debounce";
+import memoize from "lodash/memoize";
 import MultiSeriesChart from "./MultiSeriesChart";
 import type { FetcherComponentProps } from "./fetcher";
 import Loader from "./Loader";
@@ -52,29 +53,34 @@ type Buckets = {
   [string]: Array<Term>
 };
 
-export function dateMonthCounts(buckets: Buckets, range: Array<Date>) {
-  // initialize each bucket to zero
-  const counts = {};
-  const keys = Object.keys(buckets);
-  range.forEach(d => {
-    counts[d.toString()] = keys.reduce((acc, next) => ({ ...acc, [next]: 0 }), {
-      value: `${months[d.getMonth()]} ${d.getFullYear()}`
+export const dateMonthCounts = memoize(
+  (buckets: Buckets, range: Array<Date>) => {
+    // initialize each bucket to zero
+    const counts = {};
+    const keys = Object.keys(buckets);
+    range.forEach(d => {
+      counts[d.toString()] = keys.reduce(
+        (acc, next) => ({ ...acc, [next]: 0 }),
+        {
+          value: `${months[d.getMonth()]} ${d.getFullYear()}`
+        }
+      );
     });
-  });
 
-  // for each date in each series - determine the bucket to which it belongs and
-  // add its count to the bucket count
-  keys.forEach(k =>
-    buckets[k].forEach(b => {
-      const month = time.timeMonth(new Date(b.value));
-      if (counts[month]) {
-        counts[month][k] += b.count;
-      }
-    })
-  );
+    // for each date in each series - determine the bucket to which it
+    // belongs and add its count to the bucket count
+    keys.forEach(k =>
+      buckets[k].forEach(b => {
+        const month = time.timeMonth(new Date(b.value));
+        if (counts[month]) {
+          counts[month][k] += b.count;
+        }
+      })
+    );
 
-  return range.map(d => counts[d.toString()]);
-}
+    return range.map(d => counts[d.toString()]);
+  }
+);
 
 export function termCounts(buckets: Buckets, terms: Array<string>) {
   const keys = Object.keys(buckets);
@@ -95,6 +101,11 @@ export function termCounts(buckets: Buckets, terms: Array<string>) {
     .map(t => counts[t])
     .filter(({ value, ...agg }) => Object.keys(agg).some(k => agg[k] > 0));
 }
+
+const boroGrades = memoize(termCounts);
+const cuisineGrades = memoize(termCounts);
+const inspectionGrades = memoize(termCounts);
+const priceGrades = memoize(termCounts);
 
 type Filters = {
   inspection_type: Array<string>,
@@ -361,24 +372,27 @@ export class App extends Component {
                 title="Grades by Boro"
                 description="Grades broken down by the boro in which the establishment is located."
                 type="bar"
-                data={termCounts(gradesByBoro, terms.boro)}
+                data={boroGrades(gradesByBoro, terms.boro)}
               />
               <MultiSeriesChart
                 title="Grades by Cuisine"
                 description="Grade broken down by the type of food served by the establishment"
                 type="barStacked"
-                data={termCounts(gradesByCuisine, terms.cuisine)}
+                data={cuisineGrades(gradesByCuisine, terms.cuisine)}
               />
               <MultiSeriesChart
                 title="Grades by Inspection Type"
                 type="bar"
-                data={termCounts(gradesByInspectionType, terms.inspection_type)}
+                data={inspectionGrades(
+                  gradesByInspectionType,
+                  terms.inspection_type
+                )}
               />
               <MultiSeriesChart
                 title="Grades by Price"
                 description="Grades broken down by the Yelp price range of the establishment."
                 type="bar"
-                data={termCounts(gradesByPrice, terms.price)}
+                data={priceGrades(gradesByPrice, terms.price)}
               />
               <List
                 title="Inspection Results"
