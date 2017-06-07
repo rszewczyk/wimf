@@ -48,7 +48,7 @@ export default class ComboChart extends Component {
 
     return (
       <Pane border marginY={1}>
-        <Title title={title} description={description} />
+        <Title size={3} title={title} description={description} />
         {hasData
           ? <ResponsiveContainer width="98%" height={300}>
               <ChartComp data={data}>

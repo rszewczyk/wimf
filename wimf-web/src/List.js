@@ -88,7 +88,7 @@ export class FetchingList extends Component {
 
     return (
       <Pane marginY={1} border style={{ minWidth: "800px" }}>
-        <Title title={title} description={description} />
+        <Title size={3} title={title} description={description} />
         {total > 0
           ? <AutoSizer disableHeight>
               {({ width }) =>

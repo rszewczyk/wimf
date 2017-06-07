@@ -7,7 +7,7 @@ results](https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Ins
 
   1. Install a Java 8 JDK
   2. Install Docker and Docker Compose
-  3. Run `./gradlew dockerBuildImage` to build and tag the docker images
+  3. Run `CI=true ./gradlew build dockerBuildImage` to build and tag the docker images
   4. Run `docker-compose up -d` to start the application and it's dependencies
   5. Visit `http://localhost:9000` in your browser
 
@@ -17,10 +17,15 @@ It will take a minute or so to ingest all 200,000+ records. You can check to see
 
   1. Install a Java 8 JDK
   2. Run a Postgres server and create a database
-  3. Run `./gradlew build`
+  3. Run `CI=true ./gradlew build`
   4. Unzip the archive in the `./wimf-ingest/build/distributions` directory and invoke the `wimf-ingest` script. Use `wimf-ingest --help` for guidance on providing the correct database connection parameters.
   5. Unzip the archive in the `./wimf-services/build/distributions` directory and invoke the `wimf-services` script. Use `wimf-services --help` for guidance on providing the correct database connection parameters.
   6. Run `./gradlew wimf-web:run`. This will start the UI development server and open a new tab in your default browser with the correct URL. It will take several seconds for the assets to compile before you see the UI.
+
+## Building Without Java
+  1. Install Docker and Docker Compose
+  2. Run `./test_docker.sh && docker-compose up -d`
+  3. Visit `http://localhost:9000` in your browser
 
 ## Motivation
 

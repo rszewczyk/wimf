@@ -2,9 +2,12 @@
 import React from "react";
 import { css } from "glamor";
 
+type Size = 1 | 2 | 3 | 4 | 5 | 6;
+
 type TitleProps = {
   title: string,
-  description?: string
+  description?: string,
+  size: Size
 };
 
 const titleStyle = css({
