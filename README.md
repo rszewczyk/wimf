@@ -22,6 +22,11 @@ It will take a minute or so to ingest all 200,000+ records. You can check to see
   5. Unzip the archive in the `./wimf-services/build/distributions` directory and invoke the `wimf-services` script. Use `wimf-services --help` for guidance on providing the correct database connection parameters.
   6. Run `./gradlew wimf-web:run`. This will start the UI development server and open a new tab in your default browser with the correct URL. It will take several seconds for the assets to compile before you see the UI.
 
+## Building Without Java
+  1. Install Docker and Docker Compose
+  2. Run `./test_docker.sh && docker-compose up -d`
+  3. Visit `http://localhost:9000` in your browser
+
 ## Motivation
 
 I've been working primarily in Go for some time now and the last time I was seriously involved with a JVM based project, I was working in Groovy/Grails. With this project I am attempting to relearn "the basics". As

@@ -13,6 +13,7 @@ import Button from "./Button";
 import ButtonBar from "./ButtonBar";
 import List from "./List";
 import Pane from "./Pane";
+import Title from "./Title";
 import Inspection from "./Inspection";
 import wrapWithFetcher from "./fetcher";
 import "./cssReset";
@@ -291,83 +292,96 @@ export class App extends Component {
     } = this.state;
 
     return (
-      <Page>
-        <Column width={2}>
-          <Pane>
-            <h3 style={{ marginLeft: "0.5rem" }}>Filters:</h3>
-            <Filter
-              name="Boro"
-              value={filters.boro}
-              onChange={this.filterChange.bind(null, "boro")}
-              options={terms.boro}
-            />
-            <Filter
-              name="Cuisine"
-              value={filters.cuisine}
-              onChange={this.filterChange.bind(null, "cuisine")}
-              options={terms.cuisine}
-            />
-            <Filter
-              name="Inspection Type"
-              value={filters.inspection_type}
-              onChange={this.filterChange.bind(null, "inspection_type")}
-              options={terms.inspection_type}
-            />
-            <ButtonBar>
-              <Button primary onClick={this.applyFilters} children="Apply" />
-              <Button onClick={this.clearFilters} children="Clear" />
-            </ButtonBar>
-          </Pane>
-        </Column>
-        <Column width={6}>
-          <Pane>
-            <MultiSeriesChart
-              title="Monthly Grade Totals"
-              description="All grades assigned per month. Drag the brush to adjust the date range for all other series."
-              type="line"
-              data={dateMonthCounts(gradesByDate, dateRange)}
-            >
-              <Brush
-                dataKey="name"
-                height={30}
-                stroke="#8884d8"
-                onChange={this.dateRangeChange}
-                startIndex={startDateIndex}
-                endIndex={endDateIndex}
+      <Column width={8}>
+        <Pane>
+          <Title
+            size={1}
+            title="What's In My Food"
+            description={`This app let's you explore New York City restaurant grades and
+              inspection results. The Health Department conducts unannounced
+              inspections of restaurants at least once a year. Inspectors check
+              for compliance in food handling, food temperature, personal hygiene
+              and vermin control.`}
+          />
+        </Pane>
+        <Page>
+          <Column width={2}>
+            <Pane>
+              <h3 style={{ marginLeft: "0.5rem" }}>Filters:</h3>
+              <Filter
+                name="Boro"
+                value={filters.boro}
+                onChange={this.filterChange.bind(null, "boro")}
+                options={terms.boro}
               />
-            </MultiSeriesChart>
-            <MultiSeriesChart
-              title="Grades by Boro"
-              description="Grades broken down by the boro in which the establishment is located."
-              type="bar"
-              data={termCounts(gradesByBoro, terms.boro)}
-            />
-            <MultiSeriesChart
-              title="Grades by Cuisine"
-              description="Grade broken down by the type of food served by the establishment"
-              type="barStacked"
-              data={termCounts(gradesByCuisine, terms.cuisine)}
-            />
-            <MultiSeriesChart
-              title="Grades by Inspection Type"
-              type="bar"
-              data={termCounts(gradesByInspectionType, terms.inspection_type)}
-            />
-            <List
-              title="Inspection Results"
-              description="Individual violations encountered during an inspection"
-              total={total}
-              filters={this.state}
-              initialRequest={createInspectionsRequest(0, this.state)}
-              rowComp={Inspection}
-              reset={resetInspections}
-              createRequest={(offset: number) =>
-                createInspectionsRequest(offset, this.state)}
-            />
-          </Pane>
-        </Column>
-        <Loader visible={loading} />
-      </Page>
+              <Filter
+                name="Cuisine"
+                value={filters.cuisine}
+                onChange={this.filterChange.bind(null, "cuisine")}
+                options={terms.cuisine}
+              />
+              <Filter
+                name="Inspection Type"
+                value={filters.inspection_type}
+                onChange={this.filterChange.bind(null, "inspection_type")}
+                options={terms.inspection_type}
+              />
+              <ButtonBar>
+                <Button primary onClick={this.applyFilters} children="Apply" />
+                <Button onClick={this.clearFilters} children="Clear" />
+              </ButtonBar>
+            </Pane>
+          </Column>
+          <Column width={6}>
+            <Pane>
+              <MultiSeriesChart
+                title="Monthly Grade Totals"
+                description="All grades assigned per month. Drag the brush to adjust the date range for all other series."
+                type="line"
+                data={dateMonthCounts(gradesByDate, dateRange)}
+              >
+                <Brush
+                  dataKey="name"
+                  height={30}
+                  stroke="#8884d8"
+                  onChange={this.dateRangeChange}
+                  startIndex={startDateIndex}
+                  endIndex={endDateIndex}
+                />
+              </MultiSeriesChart>
+              <MultiSeriesChart
+                title="Grades by Boro"
+                description="Grades broken down by the boro in which the establishment is located."
+                type="bar"
+                data={termCounts(gradesByBoro, terms.boro)}
+              />
+              <MultiSeriesChart
+                title="Grades by Cuisine"
+                description="Grade broken down by the type of food served by the establishment"
+                type="barStacked"
+                data={termCounts(gradesByCuisine, terms.cuisine)}
+              />
+              <MultiSeriesChart
+                title="Grades by Inspection Type"
+                type="bar"
+                data={termCounts(gradesByInspectionType, terms.inspection_type)}
+              />
+              <List
+                title="Inspection Results"
+                description="Individual violations encountered during an inspection"
+                total={total}
+                filters={this.state}
+                initialRequest={createInspectionsRequest(0, this.state)}
+                rowComp={Inspection}
+                reset={resetInspections}
+                createRequest={(offset: number) =>
+                  createInspectionsRequest(offset, this.state)}
+              />
+            </Pane>
+          </Column>
+          <Loader visible={loading} />
+        </Page>
+      </Column>
     );
   }
 }
