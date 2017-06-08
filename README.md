@@ -11,7 +11,7 @@ follow [the instructions](https://www.yelp.com/developers/documentation/v3/authe
 variable `YELP_API_TOKEN` no matter which of the three methods you choose from below. Note that this is an optional step. If you choose not to ingest the Yelp data, you 
 can still explore the NY Restaurant Grade data.
 
-## Getting Started With Docker
+## Getting Started With Docker/Gradle
 
   1. Install a Java 8 JDK
   2. Install Docker and Docker Compose
@@ -19,10 +19,7 @@ can still explore the NY Restaurant Grade data.
   4. Run `docker-compose up -d` to start the application and it's dependencies
   5. Visit `http://localhost:9000` in your browser
 
-It should take less than a minute to ingest all 200,000+ inspection reports. However the Yelp take a lot longer. You can check to see if the ingest process is complete by running `docker-compose logs ingest`. The application
-can still be use with
-
-## Building Without Docker
+## Getting Started - Java Only
 
   1. Install a Java 8 JDK
   2. Run a Postgres server and create a database
@@ -31,10 +28,12 @@ can still be use with
   5. Unzip the archive in the `./wimf-services/build/distributions` directory and invoke the `wimf-services` script. Use `wimf-services --help` for guidance on providing the correct database connection parameters.
   6. Run `./gradlew wimf-web:run`. This will start the UI development server and open a new tab in your default browser with the correct URL. It will take several seconds for the assets to compile before you see the UI.
 
-## Building Without Java
+## Getting Started - Docker Only
   1. Install Docker and Docker Compose
   2. Run `./test_docker.sh && docker-compose up -d`
   3. Visit `http://localhost:9000` in your browser
+  
+It should take less than a minute to ingest all 200,000+ inspection reports. However the Yelp data take a lot longer. You don't need to wait for it thought, you can begin exploring the data once the web server is running.
 
 ## Motivation
 
