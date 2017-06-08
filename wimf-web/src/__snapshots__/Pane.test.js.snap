@@ -23,7 +23,7 @@ exports[`renders correctly 1`] = `
 
 exports[`renders correctly 2`] = `
 <div
-  data-css-emxoea=""
+  data-css-1r76psi=""
   style={
     Object {
       "marginBottom": 0,
@@ -44,7 +44,7 @@ exports[`renders correctly 2`] = `
 
 exports[`renders correctly 3`] = `
 <div
-  data-css-emxoea=""
+  data-css-1r76psi=""
   style={
     Object {
       "marginBottom": "1.0rem",

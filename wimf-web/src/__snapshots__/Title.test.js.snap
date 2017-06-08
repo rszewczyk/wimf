@@ -2,7 +2,7 @@
 
 exports[`renders correctly 1`] = `
 <div
-  data-css-12i5fdo=""
+  data-css-7q9pzb=""
 >
   <h3>
     some title
@@ -12,7 +12,7 @@ exports[`renders correctly 1`] = `
 
 exports[`renders correctly 2`] = `
 <div
-  data-css-12i5fdo=""
+  data-css-7q9pzb=""
 >
   <h3>
     some title

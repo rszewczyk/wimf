@@ -61,7 +61,7 @@ export class FetchingList extends Component {
     }
 
     return (
-      <div key={key} style={style}>
+      <div key={key} style={{ ...style, overflow: "hidden" }}>
         {content}
       </div>
     );
@@ -87,7 +87,7 @@ export class FetchingList extends Component {
     const { total, title, description } = this.props;
 
     return (
-      <Pane marginY={1} border style={{ minWidth: "800px" }}>
+      <Pane marginY={1} border>
         <Title size={3} title={title} description={description} />
         {total > 0
           ? <AutoSizer disableHeight>
@@ -95,7 +95,7 @@ export class FetchingList extends Component {
                 <List
                   height={400}
                   width={width}
-                  rowHeight={120}
+                  rowHeight={150}
                   rowRenderer={this.rowRenderer}
                   rowCount={list.length + 1}
                 />}

@@ -17,7 +17,8 @@ const paneStyle = css({
 
 const withBorder = merge(paneStyle, {
   border: "1px solid gray",
-  borderRadius: "3px"
+  borderRadius: "3px",
+  minWidth: "700px"
 });
 
 const margins = ["0.5rem", "0.875rem", "1.0rem", "2.0rem", "4.0rem"];

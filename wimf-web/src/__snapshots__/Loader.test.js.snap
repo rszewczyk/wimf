@@ -5,7 +5,8 @@ exports[`renders correctly 1`] = `
   data-css-185on8x=""
 >
   <div
-    data-css-1agdsf=""
+    data-css-1ik39hp=""
+    style={undefined}
   >
     <div />
   </div>

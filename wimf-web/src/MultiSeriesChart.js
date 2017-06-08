@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from "react";
+import { css } from "glamor";
 import {
   ResponsiveContainer,
   LineChart,
@@ -15,6 +16,7 @@ import {
 import Pane from "./Pane";
 import NoResults from "./NoResults";
 import Title from "./Title";
+import Spinner from "./Spinner";
 
 const colors = [
   "#8884d8",
@@ -26,19 +28,33 @@ const colors = [
   "#d0ed57"
 ];
 
+const containerStyle = css({
+  position: "relative",
+  " > div:first-child": {
+    "> div": {
+      borderColor: "gray",
+      position: "absolute",
+      right: 10,
+      top: 10,
+      borderBottomColor: "transparent"
+    }
+  }
+});
+
 type ComboChartProps = {
   data: Array<Object>,
   type: "line" | "bar" | "barStacked",
   children?: any,
   title: string,
-  description?: string
+  description?: string,
+  loading?: boolean
 };
 
 export default class ComboChart extends Component {
   props: ComboChartProps;
 
   render() {
-    const { data, type, children, title, description } = this.props;
+    const { data, type, children, title, description, loading } = this.props;
     const { value, ...first } = data[0] || {};
     const dataKeys = Object.keys(first);
 
@@ -47,38 +63,41 @@ export default class ComboChart extends Component {
     const ChartComp = type === "line" ? LineChart : BarChart;
 
     return (
-      <Pane border marginY={1}>
-        <Title size={3} title={title} description={description} />
-        {hasData
-          ? <ResponsiveContainer width="98%" height={300}>
-              <ChartComp data={data}>
-                <YAxis />
-                <XAxis dataKey="value" />
-                <Tooltip />
-                <Legend />
-                {type === "line" && <CartesianGrid strokeDasharray="3 3" />}
-                {type === "line"
-                  ? dataKeys.map((k, i) =>
-                      <Line
-                        type="monotone"
-                        key={i}
-                        dataKey={k}
-                        stroke={colors[i]}
-                      />
-                    )
-                  : dataKeys.map((k, i) =>
-                      <Bar
-                        stackId={type === "barStacked" ? "value" : null}
-                        key={i}
-                        dataKey={k}
-                        fill={colors[i]}
-                      />
-                    )}
-                {children}
-              </ChartComp>
-            </ResponsiveContainer>
-          : <NoResults />}
-      </Pane>
+      <div {...containerStyle}>
+        {loading ? <Spinner small /> : <div />}
+        <Pane border marginY={1}>
+          <Title size={3} title={title} description={description} />
+          {hasData
+            ? <ResponsiveContainer width="98%" height={300}>
+                <ChartComp data={data}>
+                  <YAxis />
+                  <XAxis dataKey="value" />
+                  <Tooltip />
+                  <Legend />
+                  {type === "line" && <CartesianGrid strokeDasharray="3 3" />}
+                  {type === "line"
+                    ? dataKeys.map((k, i) =>
+                        <Line
+                          type="monotone"
+                          key={i}
+                          dataKey={k}
+                          stroke={colors[i]}
+                        />
+                      )
+                    : dataKeys.map((k, i) =>
+                        <Bar
+                          stackId={type === "barStacked" ? "value" : null}
+                          key={i}
+                          dataKey={k}
+                          fill={colors[i]}
+                        />
+                      )}
+                  {children}
+                </ChartComp>
+              </ResponsiveContainer>
+            : <NoResults />}
+        </Pane>
+      </div>
     );
   }
 }

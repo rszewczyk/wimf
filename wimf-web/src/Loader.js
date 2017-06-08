@@ -1,28 +1,7 @@
 // @flow
 import React from "react";
 import { css, merge } from "glamor";
-
-const rotate = css.keyframes({
-  "0%": { transform: "rotate(0deg)" },
-  "50%": { transform: "rotate(180deg)" },
-  "100%": { transform: "rotate(360deg)" }
-});
-
-const ballStyle = css({
-  "> div": {
-    backgroundColor: "#fff",
-    borderRadius: "100%",
-    margin: "2px",
-    animationFillMode: "both",
-    border: "4px solid #fff",
-    borderBottomColor: "transparent",
-    height: "52px",
-    width: "52px",
-    background: "transparent !important",
-    display: "inline-block",
-    animation: `${rotate} 0.75s 0s linear infinite`
-  }
-});
+import Spinner from "./Spinner";
 
 const overlayStyle = css({
   position: "fixed",
@@ -48,9 +27,7 @@ type LoaderProps = {
 export default function Loader(props: LoaderProps) {
   return (
     <div {...(props.visible ? overlayVisibleStyle : overlayStyle)}>
-      <div {...ballStyle}>
-        <div />
-      </div>
+      <Spinner />
     </div>
   );
 }

@@ -18,3 +18,11 @@ css.global("select", {
   borderRadius: "3px",
   lineHeight: 1.75
 });
+
+css.global("html", {
+  boxSizing: "border-box"
+});
+
+css.global("*, *:before, *:after", {
+  boxSizing: "border-box"
+});

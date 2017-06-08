@@ -11,14 +11,20 @@ type TitleProps = {
 };
 
 const titleStyle = css({
-  marginBottom: "1.0rem"
+  marginBottom: "1.0rem",
+  display: "flex",
+  flexDirection: "column",
+  " h1, h2, h3, h4, h5, h6": {
+    display: "inline-block"
+  }
 });
 
 export default function(props: TitleProps) {
-  const { title, description } = props;
+  const { title, description, size } = props;
+
   return (
     <div {...titleStyle}>
-      <h3>{title}</h3>
+      {React.createElement(`h${size || 3}`, null, title)}
       {description && <div>{description}</div>}
     </div>
   );
