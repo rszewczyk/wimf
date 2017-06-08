@@ -133,6 +133,8 @@ public class App {
                         .getListings(inspections.distinct(ri -> ri.businessID))
                         .buffer(10)
                         .forEach(b -> Business.save(dao, b));
+            } else {
+                log.info("No Yelp API token found. Skipping Yelp ingest.");
             }
 
             // TODO: error handling for a failed inspection

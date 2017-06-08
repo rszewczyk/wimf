@@ -1,7 +1,15 @@
 # What's In My Food?
 
 An example full stack web application that explores New York's public data for [restaurant inspection
-results](https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j).
+results](https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j) combined with business data retrieved from Yelp.
+
+
+## Getting Started with Yelp.
+
+If you want to include Yelp data in the ingest you will first need to sign up for a [Yelp developer account](https://www.yelp.com/developers/documentation/v3). After that,
+follow [the instructions](https://www.yelp.com/developers/documentation/v3/authentication) to obtain a token. You will need to have this token in your environment as the
+variable `YELP_API_TOKEN` no matter which of the three methods you choose from below. Note that this is an optional step. If you choose not to ingest the Yelp data, you 
+can still explore the NY Restaurant Grade data.
 
 ## Getting Started With Docker
 
@@ -11,7 +19,8 @@ results](https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Ins
   4. Run `docker-compose up -d` to start the application and it's dependencies
   5. Visit `http://localhost:9000` in your browser
 
-It will take a minute or so to ingest all 200,000+ records. You can check to see if the ingest process is complete by running `docker-compose logs ingest`.
+It should take less than a minute to ingest all 200,000+ inspection reports. However the Yelp take a lot longer. You can check to see if the ingest process is complete by running `docker-compose logs ingest`. The application
+can still be use with
 
 ## Building Without Docker
 
