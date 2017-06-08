@@ -32,8 +32,14 @@ can still explore the NY Restaurant Grade data.
   1. Install Docker and Docker Compose
   2. Run `./test_docker.sh && docker-compose up -d`
   3. Visit `http://localhost:9000` in your browser
-  
-It should take less than a minute to ingest all 200,000+ inspection reports. However the Yelp data take a lot longer. You don't need to wait for it thought, you can begin exploring the data once the web server is running.
+
+
+## Now What
+
+It should take less than a minute to ingest all 200,000+ inspection reports. However the Yelp data takes a lot longer. You don't need to wait for it though, you can begin exploring the data once the web server is running.
+The UI is a series of charts that show the breakdown of the NY Health Department Restaurant grades across different categories such as location of the Restaurant and the type of Cuisine served. If you chose to populate the
+Yelp data you can also view the relationship between grade and Yelp's price category. You can also manipulate the filters in the side bar and the date range slider to view different slices of the data. Finally, 
+there is a list of violations that occurred at each inspection in the dataset. Enjoy!
 
 ## Motivation
 
